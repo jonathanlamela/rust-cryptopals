@@ -18,16 +18,16 @@ use std::str;
 
 impl CryptoVecChunks for Vec<&[u8]> {
     fn contains_duplicates(&mut self) -> bool {
-        //Lunghezza iniziale del vettore
+        //Initial length of the vector
         let len = self.len();
 
-        //La funzione dedup funziona solo con vettori ordinati, quindi prima di chiamare la funzione dedup ordino il vettore
+        //The dedup function only works with sorted vectors, so I sort the vector before calling the dedup function
         self.sort();
 
-        //Rimuovo i duplicati
+        //Remove duplicates from the vector
         self.dedup();
 
-        //Se la lunghezza iniziale del vettore è diversa dalla lunghezza senza duplicati allora il vettore conteneva duplicai
+        //If the initial length of the vector is different from the length without duplicates then the vector contained duplicates
         len != self.len()
     }
 }
@@ -40,23 +40,23 @@ impl Oracle for OracleBase {
         let mode: MODE = self.mode;
         let iv = &self.iv;
 
-        //Vettore per il clear text modificato
+        //Vector for the modified cleartext
         let mut cleartext = Vec::new();
 
-        //Aggiungo il prefisso
+        //Add the prefix
         if let Some(prefix_bytes) = prefix {
             cleartext.extend_from_slice(prefix_bytes);
         }
 
-        //Aggiungo il contenuto principale
+        //Add the main content
         cleartext.extend_from_slice(u);
 
-        //Aggiungo il suffisso
+        //Add the suffix
         if let Some(suffix_bytes) = suffix {
             cleartext.extend_from_slice(suffix_bytes);
         }
 
-        //Crittografia del valore in CBC o EBC
+        //Encrypt the value in CBC or EBC
         let encrypted = if mode == MODE::CBC {
             cleartext.ssl_cbc_encrypt(key, &iv.clone().unwrap(), Some(true))
         } else if mode == MODE::ECB {
@@ -72,7 +72,7 @@ impl Oracle for OracleBase {
 }
 
 impl USizeCrypt for usize {
-    //Crea un blocco di bytes random partendo dal valore dell'istanza usize
+    //Create a random block of bytes starting from the usize instance value
     fn random_block(self) -> Vec<u8> {
         let mut key = vec![0u8; self];
         let mut rng = rand::thread_rng();
@@ -81,7 +81,7 @@ impl USizeCrypt for usize {
         key
     }
 
-    // Il primo valore indica il numero di blocchi 'chunks', il secondo quanti byte bisogna aggiungere al valore usize affinché sia multiplo di 16
+    // The first value indicates the number of 'chunks', the second how many bytes need to be added to the usize value to make it a multiple of 16
     fn chunks_count(self) -> (usize, usize) {
         let q = (self + 16 - 1) / 16;
         let r = q * 16 - self;
@@ -93,10 +93,10 @@ impl CustomCrypter11 {
     pub fn new() -> Result<Self, JlmCryptoErrors> {
         let mut random_generator = thread_rng();
 
-        //Crea di default un CIPHER in modalità ECB
+        //Create a default CIPHER in ECB mode
         let mut cipher: Cipher = Cipher::aes_128_ecb();
 
-        //Scegli casualmente una modalità tra ECB o CBC
+        //Randomly choose a mode between ECB or CBC
         let mode: MODE = if random_generator.gen() {
             MODE::ECB
         } else {
@@ -104,14 +104,14 @@ impl CustomCrypter11 {
             MODE::CBC
         };
 
-        //Genera una chiave casuale della dimensione del blocco
+        //Generate a random key of the block size
         let key = cipher.block_size().random_block();
 
-        //Genera prefisso e suffisso casuale di dimensione compresa tra 5 e 10
+        //Generate random prefix and suffix of length between 5 and 10
         let prefix: Vec<u8> = random_generator.gen_range(5..=10).random_block();
         let suffix: Vec<u8> = random_generator.gen_range(5..=10).random_block();
 
-        //Se la modalità è CBC crea una chiave casuale da usare come IV
+        //If the mode is CBC create a random key to use as IV
         let iv: Option<Vec<u8>> = if mode == MODE::CBC {
             Some(cipher.block_size().random_block())
         } else {
@@ -129,41 +129,41 @@ impl CustomCrypter11 {
         })
     }
 
-    //Ottieni il valore della modalità usata per il cipher, restituisce true se è ECB
+    //Get the value of the mode used for the cipher, returns true if it is ECB
     pub fn is_ecb(&self) -> bool {
         return self.base.mode == MODE::ECB;
     }
 
-    //Calcola se la chiave è stata criptata con ECB
+    //Calculate if the key has been encrypted with ECB
     pub fn is_ecb_calculated(&self, vec: Vec<u8>) -> Result<bool, JlmCryptoErrors> {
-        // Dividi la chiave in blocchi da 16, salta il primo e prendi il second e il terzo
+        // Split the key into 16-byte blocks, skip the first and take the second and third
         let blocks: Vec<&[u8]> = vec.chunks(16).skip(1).take(2).collect();
 
-        //Verifica se sono uguali
+        //Check if they are equal
         Ok(blocks[0] == blocks[1])
     }
 
-    //Ottieni il valore della modalità usata per il cipher, restituisce true se è CBC
+    //Get the value of the mode used for the cipher, returns true if it is CBC
     pub fn is_cbc(&self) -> bool {
         return self.base.mode == MODE::CBC;
     }
 }
 
 impl CustomCrypter12 {
-    //Dimensione del blocco
+    //Block size
     const BLOCK_SIZE: usize = 16;
 
     pub fn new() -> Result<Self, JlmCryptoErrors> {
-        // Crea una chiave casuale
+        // Create a random key
         let key = Self::BLOCK_SIZE.random_block().to_vec();
 
-        //Crea istanza della classe Base64 partendo da una stringa
+        //Create an instance of the Base64 class from a string
         let base64_suffix = Base64::from_string(String::from("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"));
         let suffix: Vec<u8> = base64_suffix
             .to_bytes()
             .unwrap_or_else(|_| panic!("Invalid hex to bytes conversion"));
 
-        // Crea una nuova istanza della classe CustomCrypter12
+        // Create a new instance of the CustomCrypter12 class
         Ok(CustomCrypter12 {
             base: OracleBase {
                 key: key,
@@ -175,13 +175,13 @@ impl CustomCrypter12 {
         })
     }
 
-    //Controlla se il cypter attuale usa il padding
+    //Check if the current crypter uses padding
     fn uses_padding(&self) -> Result<bool, JlmCryptoErrors> {
-        // STEP
-        // Cifra una stringa con un byte
-        // Cifra una stringa vuota
-        // Calcola la differenza di lunghezza tra la prima e la seconda
-        // Se la differenza è pari e il modulo restituisce 0 allora il crypter usa il padding
+        // STEPS
+        // Encrypt a string with one byte
+        // Encrypt an empty string
+        // Calculate the length difference between the first and second
+        // If the difference is even and the modulo returns 0 then the crypter uses padding
         Ok(
             (&self.base.encrypt(&[0]).unwrap().len() - &self.base.encrypt(&[]).unwrap().len())
                 % Self::BLOCK_SIZE
@@ -190,100 +190,100 @@ impl CustomCrypter12 {
     }
 
     pub fn prefix_plus_suffix_length(&self) -> Result<usize, JlmCryptoErrors> {
-        // Calcola la dimensione di una stringa cifrata vuota
+        // Calculate the length of an empty encrypted string
         let initial = self.base.encrypt(&[]).unwrap().len();
 
-        // Se non utilizza il padding, restituisci la dimensione della stringa cifrata iniziale come risultato
+        // If it does not use padding, return the initial encrypted string length as the result
         if !&self.uses_padding().unwrap() {
             return Ok(initial);
         }
 
-        // Crea un array di byte vuoto di dimensione 16 riempito con zeri
+        // Create an empty byte array of size 16 filled with zeros
         let input = [0; Self::BLOCK_SIZE];
         if let Some(index) = (1..=Self::BLOCK_SIZE).find(|&i| {
             if let Ok(ciphertext) = self.base.encrypt(&input[..i]) {
-                // Verifica se la lunghezza della stringa cifrata è diversa dalla lunghezza iniziale
+                // Check if the length of the encrypted string is different from the initial length
                 initial != ciphertext.len()
             } else {
                 false
             }
         }) {
-            // Restituisci la differenza tra la dimensione iniziale e l'indice trovato
+            // Return the difference between the initial size and the found index
             Ok(initial - index)
         } else {
-            // Se non è stata trovata alcuna variazione di lunghezza dell'output, restituisci un errore corrispondente
+            // If no output length variation was found, return a corresponding error
             Err(JlmCryptoErrors::NoOutputLengthChange)
         }
     }
 
-    // Trova il suffisso
+    // Find the suffix
     pub fn get_suffix(&self) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Calcola la lunghezza del prefisso.
+        // Calculate the length of the prefix.
         let prefix_len = self.prefix_length().unwrap();
 
-        // Calcola la lunghezza del suffisso.
+        // Calculate the length of the suffix.
         let suffix_len = self.prefix_plus_suffix_length().unwrap() - prefix_len;
 
-        // Ottieni il numero di blocchi completi nel prefisso e la lunghezza frazionaria rimanente.
+        // Get the number of complete blocks in the prefix and the remaining fractional length.
         let (prefix_chunks_count, prefix_fill_len) = prefix_len.chunks_count();
 
-        // Inizializza un vettore vuoto per memorizzare il suffisso.
+        // Initialize an empty vector to store the suffix.
         let mut suffix = Vec::new();
 
-        // Prepara il vettore di input con zeri per trovare il suffisso.
+        // Prepare the input vector with zeros to find the suffix.
         let mut input = vec![0; prefix_fill_len + Self::BLOCK_SIZE - 1];
 
-        // Crea un vettore di cifre virtuali per diversi spostamenti a sinistra dell'input.
+        // Create a vector of virtual ciphertexts for different left shifts of the input.
         let virtual_ciphertexts = (0..Self::BLOCK_SIZE)
             .map(|left_shift| self.base.encrypt(&input[left_shift..]))
             .collect::<Result<Vec<Vec<u8>>, JlmCryptoErrors>>()
             .unwrap();
 
-        // Trova il suffisso tramite verifica forzata per ogni valore di byte.
+        // Find the suffix through forced verification for each byte value.
         for i in 0..suffix_len {
             let block_index = prefix_chunks_count + i / Self::BLOCK_SIZE;
             let left_shift = i % Self::BLOCK_SIZE;
 
-            // Prova ogni valore di byte (da 0 a 255) per trovare un byte di suffisso corrispondente.
+            // Try every byte value (from 0 to 255) to find a matching suffix byte.
             for u in 0u8..=255 {
                 input.push(u);
 
-                // Verifica se la cifra virtuale corrisponde alla cifra reale per il blocco corrispondente.
+                // Check if the virtual ciphertext matches the real ciphertext for the corresponding block.
                 if virtual_ciphertexts[left_shift]
                     [block_index * Self::BLOCK_SIZE..(block_index + 1) * Self::BLOCK_SIZE]
                     == self.base.encrypt(&input[left_shift..]).unwrap()
                         [block_index * Self::BLOCK_SIZE..(block_index + 1) * Self::BLOCK_SIZE]
                 {
-                    // Se viene trovata una corrispondenza, aggiungi il valore di byte al suffisso e interrompi il ciclo.
+                    // If a match is found, add the byte value to the suffix and break the loop.
                     suffix.push(u);
                     break;
                 }
 
-                // Se non viene trovata alcuna corrispondenza, rimuovi l'ultimo byte dall'input e passa al valore di byte successivo.
+                // If no match is found, remove the last byte from the input and move to the next byte value.
                 input.pop();
             }
         }
         Ok(suffix)
     }
 
-    //Calcola la lunghezza del prefisso
+    // Calculate the prefix length
     pub fn prefix_length(&self) -> Result<usize, JlmCryptoErrors> {
-        // Ottieni la posizione di inizio del prefisso.
+        // Get the starting position of the prefix.
         let offset = self.prefix_blocks_count().unwrap() * Self::BLOCK_SIZE;
 
-        // Crea un blocco costante riempito con il valore di byte 0.
+        // Create a constant block filled with the byte value 0.
         let constant_block = vec![0u8; 16];
 
-        // Estrai il blocco crittografato iniziale da `offset` a `offset + Self::BLOCK_SIZE`.
+        // Extract the initial encrypted block from `offset` to `offset + Self::BLOCK_SIZE`.
         let initial =
             &self.base.encrypt(&constant_block).unwrap()[offset..(offset + Self::BLOCK_SIZE)];
 
-        // Verifica ogni blocco crittografato successivo a partire da diverse posizioni di `constant_block`.
+        // Check each subsequent encrypted block starting from different positions of `constant_block`.
         for i in 0..Self::BLOCK_SIZE {
-            // Cifra la porzione di `constant_block` che inizia dall'indice `i+1`.
+            // Encrypt the portion of `constant_block` starting from index `i+1`.
             let cur = self.base.encrypt(&constant_block[i + 1..]).unwrap();
 
-            // Se il blocco corrente non corrisponde al blocco iniziale, restituisci la lunghezza del prefisso (i).
+            // If the current block does not match the initial block, return the prefix length (i).
             if cur.len() < offset + Self::BLOCK_SIZE
                 || initial != &cur[offset..(offset + Self::BLOCK_SIZE)]
             {
@@ -291,21 +291,21 @@ impl CustomCrypter12 {
             }
         }
 
-        // Se tutti i blocchi crittografati successivi corrispondono al blocco iniziale, restituisci la dimensione del blocco completo (Self::BLOCK_SIZE).
+        // If all subsequent encrypted blocks match the initial block, return the full block size (Self::BLOCK_SIZE).
         Ok(Self::BLOCK_SIZE)
     }
 
-    // Ottieni il numero di blocchi per il prefisso
+    // Get the number of blocks for the prefix
     pub fn prefix_blocks_count(&self) -> Result<usize, JlmCryptoErrors> {
-        // Cifra il byte `[0]` e il byte `[1]`
+        // Encrypt the byte `[0]` and the byte `[1]`
         let encrypted_0 = self.base.encrypt(&[0]).unwrap();
         let encrypted_1 = self.base.encrypt(&[1]).unwrap();
 
-        // Dividi i byte cifrati in blocchi di dimensione `Self::BLOCK_SIZE`
+        // Divide the encrypted bytes into blocks of size `Self::BLOCK_SIZE`
         let chunks_0 = encrypted_0.chunks(Self::BLOCK_SIZE);
         let chunks_1 = encrypted_1.chunks(Self::BLOCK_SIZE);
 
-        // Trova la posizione del primo blocco in cui i contenuti sono diversi
+        // Find the position of the first block where the contents are different
         if let Some(result) = chunks_0.zip(chunks_1).position(|(x, y)| x != y) {
             Ok(result)
         } else {
@@ -318,7 +318,7 @@ impl CustomCrypter13 {
     pub fn new() -> Result<Self, JlmCryptoErrors> {
         let block_size: usize = 16;
 
-        //Genera una chiave casuale di 16 byte
+        // Generate a random 16-byte key
         let key = block_size.random_block();
 
         Ok({
@@ -334,9 +334,9 @@ impl CustomCrypter13 {
         })
     }
 
-    //Crea la stringa per il profilo partendo dall'email
+    // Create the profile string from the email
     pub fn profile_for(&self, email: String) -> Result<String, JlmCryptoErrors> {
-        //Controlla se il valore email contiene  il carattere '&'
+        // Check if the email value contains the '&' character
         if email.contains("&") {
             return Err(JlmCryptoErrors::InvalidSet2Challenge13Chars);
         } else {
@@ -349,14 +349,14 @@ impl CustomCrypter13 {
         }
     }
 
-    //Genera un email casuale che sia lunga 9 caratteri
+    // Generate a random email that is 9 characters long
     pub fn generate_test_email(&self) -> String {
         let mut rng = rand::thread_rng();
 
-        //Username lungo 4 caratteri
+        // Username is 4 characters long
         let username: String = (0..4).map(|_| rng.gen_range(b'a'..=b'z') as char).collect();
 
-        //Dominio lungo 4 caratteri
+        // Domain is 4 characters long
         let domain: String = (0..4).map(|_| rng.gen_range(b'a'..=b'z') as char).collect();
 
         format!("{}@{}.com", username, domain)
@@ -365,7 +365,7 @@ impl CustomCrypter13 {
 
 impl Oracle for CustomCrypter13 {
     fn encrypt(&self, u: &[u8]) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Cifra l'array ricevuto in modalità ECB con la chiave generata in fase di istanza
+        // Encrypt the received array in ECB mode with the key generated during instantiation
         Ok(u.to_vec()
             .ssl_ecb_encrypt(&self.base.key, Some(true))
             .unwrap())
@@ -375,30 +375,30 @@ impl Oracle for CustomCrypter13 {
 impl CustomCrypter14 {
     pub const BLOCK_SIZE: usize = 16;
 
-    //Lunghezza massima del prefisso
+    // Maximum prefix length
     pub const MAX_PREFIX_SIZE: usize = 10;
 
     pub fn new() -> Result<Self, JlmCryptoErrors> {
         let mut rng: rand::prelude::ThreadRng = rand::thread_rng();
 
-        // Genera una chiave casuale
+        // Generate a random 16-byte key
         let key: Vec<u8> = Self::BLOCK_SIZE.random_block().to_vec();
 
-        // Genera una lunghezza casuale del prefisso
+        // Generate a random prefix length
         let prefix_size: usize = rng.gen_range(1..=Self::MAX_PREFIX_SIZE);
 
-        //Genera un prefisso casuale
+        // Generate a random prefix
         let prefix: Vec<u8> = prefix_size.random_block();
 
-        //Inizializza il suffisso
+        // Initialize the suffix
         let base64_suffix = Base64::from_string(String::from("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"));
 
-        // Trasforma il valore Base64 in bytes
+        // Convert the Base64 suffix to bytes
         let suffix: Vec<u8> = base64_suffix
             .to_bytes()
             .unwrap_or_else(|_| panic!("Invalid hex to bytes conversion"));
 
-        // Crea una nuova istanza della casse CustomCrypter14
+        // Create a new instance of the CustomCrypter14 class
         Ok(CustomCrypter14 {
             base: OracleBase {
                 key: key,
@@ -410,17 +410,17 @@ impl CustomCrypter14 {
         })
     }
 
-    // Ottieni il numero di blocchi per il prefisso
+    // Get the number of blocks for the prefix
     pub fn prefix_blocks_count(&self) -> Result<usize, JlmCryptoErrors> {
-        // Cifra il byte `[0]` e il byte `[1]`
+        // Encrypt the byte `[0]` and the byte `[1]`
         let encrypted_0: Vec<u8> = self.base.encrypt(&[0]).unwrap();
         let encrypted_1: Vec<u8> = self.base.encrypt(&[1]).unwrap();
 
-        // Dividi i byte cifrati in blocchi della dimensione `Self::BLOCK_SIZE`
+        // Divide the encrypted bytes into chunks of size `Self::BLOCK_SIZE`
         let chunks_0: std::slice::Chunks<'_, u8> = encrypted_0.chunks(Self::BLOCK_SIZE);
         let chunks_1: std::slice::Chunks<'_, u8> = encrypted_1.chunks(Self::BLOCK_SIZE);
 
-        // Trova la posizione del primo blocco in cui i contenuti sono diversi
+        // Find the position of the first block where the contents differ
         if let Some(result) = chunks_0.zip(chunks_1).position(|(x, y)| x != y) {
             Ok(result)
         } else {
@@ -428,13 +428,13 @@ impl CustomCrypter14 {
         }
     }
 
-    //Controlla se il cypter attuale usa il padding
+    // Check if the current crypter uses padding
     fn uses_padding(&self) -> Result<bool, JlmCryptoErrors> {
         // STEP
-        // Cifra una stringa con un byte
-        // Cifra una stringa vuota
-        // Calcola la differenza di lunghezza tra la prima e la seconda
-        // Se la differenza è pari e il modulo restituisce 0 allora il crypter usa il padding
+        // Encrypt a string with one byte
+        // Encrypt an empty string
+        // Calculate the length difference between the first and second
+        // If the difference is even and the modulo returns 0 then the crypter uses padding
         Ok(
             (&self.base.encrypt(&[0]).unwrap().len() - &self.base.encrypt(&[]).unwrap().len())
                 % Self::BLOCK_SIZE
@@ -443,99 +443,99 @@ impl CustomCrypter14 {
     }
 
     pub fn prefix_plus_suffix_length(&self) -> Result<usize, JlmCryptoErrors> {
-        // Calcola la dimensione di una stringa cifrata vuota
+        // Calculate the length of an empty encrypted string
         let initial = self.base.encrypt(&[]).unwrap().len();
 
-        // Se non utilizza il padding, restituisci la dimensione della stringa cifrata iniziale come risultato
+        // If it does not use padding, return the length of the initial encrypted string as the result
         if !&self.uses_padding().unwrap() {
             return Ok(initial);
         }
 
-        // Crea un array di byte vuoto di dimensione 16 riempito con zeri
+        // Create an empty byte array of size 16 filled with zeros
         let input = [0; Self::BLOCK_SIZE];
         if let Some(index) = (1..=Self::BLOCK_SIZE).find(|&i| {
             if let Ok(ciphertext) = self.base.encrypt(&input[..i]) {
-                // Verifica se la lunghezza della stringa cifrata è diversa dalla lunghezza iniziale
+                // Check if the length of the encrypted string is different from the initial length
                 initial != ciphertext.len()
             } else {
                 false
             }
         }) {
-            // Restituisci la differenza tra la dimensione iniziale e l'indice trovato
+            // Return the difference between the initial size and the found index
             Ok(initial - index)
         } else {
-            // Se non è stata trovata alcuna variazione di lunghezza dell'output, restituisci un errore corrispondente
+            // If no output length variation was found, return the corresponding error
             Err(JlmCryptoErrors::NoOutputLengthChange)
         }
     }
 
     pub fn get_suffix(&self) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Calcola la lunghezza del prefisso.
+        // Calculate the length of the prefix.
         let prefix_len = self.prefix_length().unwrap();
 
-        // Calcola la lunghezza del suffisso.
+        // Calculate the length of the suffix.
         let suffix_len = self.prefix_plus_suffix_length().unwrap() - prefix_len;
 
-        // Ottieni il numero di blocchi completi nel prefisso e la lunghezza frazionaria rimanente.
+        // Get the number of complete blocks in the prefix and the remaining fractional length.
         let (prefix_ch_count, prefix_flen) = prefix_len.chunks_count();
 
-        // Inizializza un vettore vuoto per memorizzare il suffisso.
+        // Initialize an empty vector to store the suffix.
         let mut suffix = Vec::new();
 
-        // Prepara il vettore di input con zeri per trovare il suffisso.
+        // Prepare the input vector with zeros to find the suffix.
         let mut input = vec![0; prefix_flen + Self::BLOCK_SIZE - 1];
 
-        // Crea un vettore di cifre virtuali per diversi spostamenti a sinistra dell'input.
+        // Create a vector of virtual ciphertexts for different left shifts of the input.
         let virtual_ciphertexts = (0..Self::BLOCK_SIZE)
             .map(|left_shift| self.base.encrypt(&input[left_shift..]))
             .collect::<Result<Vec<Vec<u8>>, JlmCryptoErrors>>()
             .unwrap();
 
-        // Trova il suffisso verificando forzatamente ogni valore di byte.
+        // Find the suffix through forced verification for each byte value.
         for i in 0..suffix_len {
             let block_index = prefix_ch_count + i / Self::BLOCK_SIZE;
             let left_shift = i % Self::BLOCK_SIZE;
 
-            // Prova ogni valore di byte (da 0 a 255) per trovare un byte di suffisso corrispondente.
+            // Try every byte value (from 0 to 255) to find a matching suffix byte.
             for u in 0u8..=255 {
                 input.push(u);
 
-                // Verifica se la cifra virtuale corrisponde alla cifra reale per il blocco corrispondente.
+                // Check if the virtual ciphertext matches the real ciphertext for the corresponding block.
                 if virtual_ciphertexts[left_shift]
                     [block_index * Self::BLOCK_SIZE..(block_index + 1) * Self::BLOCK_SIZE]
                     == self.base.encrypt(&input[left_shift..]).unwrap()
                         [block_index * Self::BLOCK_SIZE..(block_index + 1) * Self::BLOCK_SIZE]
                 {
-                    // Se viene trovata una corrispondenza, aggiungi il valore di byte al suffisso e interrompi il ciclo.
+                    // If a match is found, add the byte value to the suffix and break the loop.
                     suffix.push(u);
                     break;
                 }
 
-                // Se non viene trovata alcuna corrispondenza, rimuovi l'ultimo byte dall'input e continua al prossimo valore di byte.
+                // If no match is found, remove the last byte from the input and continue to the next byte value.
                 input.pop();
             }
         }
         Ok(suffix)
     }
 
-    // Ottieni la lunghezza del prefisso
+    // Get the length of the prefix
     pub fn prefix_length(&self) -> Result<usize, JlmCryptoErrors> {
-        // Ottieni la posizione di inizio del prefisso
+        // Get the starting position of the prefix
         let offset = self.prefix_blocks_count().unwrap() * Self::BLOCK_SIZE;
 
-        // Crea un blocco costante riempito con il valore di byte 0.
+        // Create a constant block filled with the byte value 0.
         let constant_block = vec![0u8; Self::BLOCK_SIZE];
 
-        // Estrai il blocco crittografato iniziale da `offset` a `offset + Self::BLOCK_SIZE`.
+        // Extract the initial encrypted block from `offset` to `offset + Self::BLOCK_SIZE`.
         let initial =
             &self.base.encrypt(&constant_block).unwrap()[offset..(offset + Self::BLOCK_SIZE)];
 
-        // Verifica ogni blocco crittografato successivo a partire da diverse posizioni di `constant_block`.
+        // Check each subsequent encrypted block starting from different positions of `constant_block`.
         for i in 0..Self::BLOCK_SIZE {
-            // Cifra la porzione di `constant_block` che inizia dall'indice `i+1`.
+            // Encrypt the portion of `constant_block` starting from index `i+1`.
             let cur = self.base.encrypt(&constant_block[i + 1..]).unwrap();
 
-            // Se il blocco corrente non corrisponde al blocco iniziale, restituisci la lunghezza del prefisso (i).
+            // If the current block does not match the initial block, return the length of the prefix (i).
             if cur.len() < offset + Self::BLOCK_SIZE
                 || initial != &cur[offset..(offset + Self::BLOCK_SIZE)]
             {
@@ -543,25 +543,25 @@ impl CustomCrypter14 {
             }
         }
 
-        // Se tutti i blocchi crittografati successivi corrispondono al blocco iniziale, restituisci la dimensione del blocco completo (Self::BLOCK_SIZE).
+        // If all subsequent encrypted blocks match the initial block, return the full block size (Self::BLOCK_SIZE).
         Ok(Self::BLOCK_SIZE)
     }
 }
 
 impl Oracle for CustomCrypter14 {
-    //Cifra l'array ottenuto in input
+    // Encrypt the array obtained in input
     fn encrypt(&self, u: &[u8]) -> Result<Vec<u8>, JlmCryptoErrors> {
         self.base.encrypt(u)
     }
 }
 
 impl CustomCrypter16 {
-    // Crea e restituisci un'istanza di questa struttura `CustomCrypter16`.
+    // Create and return an instance of this structure `CustomCrypter16`.
     pub fn new() -> CustomCrypter16 {
         return CustomCrypter16 {};
     }
 
-    // Aggiunge quotatura alle occorrenze dei caratteri ';' e '=' nella stringa di input.
+    // Adds quoting to occurrences of the characters ';' and '=' in the input string.
     pub fn quote_str(&self, input: &str) -> String {
         let mut quoted_input = str::replace(input, ";", "\";\"");
         quoted_input = str::replace(&quoted_input[..], "=", "\"=\"");
@@ -569,7 +569,7 @@ impl CustomCrypter16 {
         quoted_input
     }
 
-    // Rimuove la quotatura aggiunta dalla funzione `quote_str`.
+    // Removes the quoting added by the `quote_str` function.
     pub fn unquote_str(&self, input: &str) -> String {
         let mut quoted_input = str::replace(input, "\";\"", ";");
         quoted_input = str::replace(&quoted_input[..], "\"=\"", "=");
@@ -577,7 +577,7 @@ impl CustomCrypter16 {
         quoted_input
     }
 
-    // Prepara una stringa per la cifratura, aggiungendo prefissi e suffissi specifici.
+    // Prepares a string for encryption by adding specific prefixes and suffixes.
     pub fn prepare_string(&self, input: &str) -> Vec<u8> {
         let input_quoted: String = self.quote_str(input);
 
@@ -587,7 +587,7 @@ impl CustomCrypter16 {
 
         let mut plaintext = Vec::new();
 
-        // Aggiungi i byte di prefisso, i byte di input quotato e i byte di suffisso al vettore `plaintext`.
+        // Adds the prefix bytes, the quoted input bytes, and the suffix bytes to the `plaintext` vector.
         plaintext.extend_from_slice(&prepend_bytes[..]);
         plaintext.extend_from_slice(&input_bytes[..]);
         plaintext.extend_from_slice(&append_bytes[..]);
@@ -616,10 +616,10 @@ impl CustomCrypter17 {
     ];
 
     pub fn new() -> Result<Self, JlmCryptoErrors> {
-        // Genera una chiave casuale
+        // Generates a random key
         let key = Self::BLOCK_SIZE.random_block().to_vec();
 
-        // Genere un IV casuale
+        // Generates a random IV
         let iv = Self::BLOCK_SIZE.random_block().to_vec();
 
         let mut rng = rand::thread_rng();
@@ -627,7 +627,7 @@ impl CustomCrypter17 {
 
         let token_extracted = Self::TOKENS[i_index].to_string();
 
-        // Crea una nuova istanza della casse CustomCrypter14
+        // Creates a new instance of the CustomCrypter14 class
         Ok(CustomCrypter17 {
             picked_token: token_extracted,
             key: key,
@@ -644,145 +644,145 @@ impl CustomCrypter17 {
     }
 }
 
-// Definizione di una struttura `Hex` che rappresenta una sequenza di byte in formato esadecimale.
+// Define a structure `Hex` to represent hexadecimal values.
 impl Hex {
-    // Costruttore per creare un nuovo oggetto `Hex` da una stringa esadecimale.
+    // Constructor to create a new `Hex` object from a hexadecimal string.
     pub fn new(s: String) -> Result<Hex, JlmCryptoErrors> {
-        // Decodifica la stringa esadecimale in bytes.
+        // Decodes the hexadecimal string into bytes.
         match hex::decode(s.clone()) {
-            // Se la decodifica va a buon fine, restituisci un oggetto `Hex` contenente la stringa.
+            // If decoding is successful, return a `Hex` object containing the string.
             Ok(_) => Ok(Hex(s)),
-            // Se c'è un errore durante la decodifica, restituisci un errore di tipo `JlmCryptoErrors`.
+            // If there is an error during decoding, return a `JlmCryptoErrors` error.
             Err(_) => Err(JlmCryptoErrors::InvalidHEXValue),
         }
     }
 
-    // Costruttore che crea un oggetto `Hex` da una stringa.
+    // Constructor to create a `Hex` object from a string.
     pub fn from_string(s: String) -> Result<Hex, JlmCryptoErrors> {
-        // Chiama il costruttore `new` per creare un oggetto `Hex` dalla stringa fornita.
+        // Calls the `new` constructor to create a `Hex` object from the provided string.
         Hex::new(s.to_string())
     }
 
-    // Costruttore che crea un oggetto `Hex` direttamente da una stringa esadecimale.
+    // Constructor to create a `Hex` object directly from a hexadecimal string.
     pub fn from_hex_string(s: String) -> Result<Hex, JlmCryptoErrors> {
-        // Crea un oggetto `Hex` contenente la stringa esadecimale fornita.
+        // Creates a `Hex` object containing the provided hexadecimal string.
         Ok(Hex(s))
     }
 
-    // Costruttore che crea un oggetto `Hex` da un vettore di bytes.
+    // Constructor to create a `Hex` object from a byte vector.
     pub fn from_bytes(s: Vec<u8>) -> Result<Hex, JlmCryptoErrors> {
-        // Codifica i bytes in formato esadecimale e tenta di parsare il risultato come un oggetto `Hex`.
+        // Encodes the bytes into hexadecimal format and attempts to parse the result as a `Hex` object.
         match hex::encode(s).parse::<Hex>() {
-            // Se il parsing va a buon fine, restituisci l'oggetto `Hex` creato.
+            // If parsing is successful, return the created `Hex` object.
             Ok(hex_value) => Ok(hex_value),
-            // Se c'è un errore durante il parsing, restituisci un errore di tipo `JlmCryptoErrors`.
+            // If there is an error during parsing, return a `JlmCryptoErrors` error.
             Err(_) => Err(JlmCryptoErrors::InvalidBytesToHEX),
         }
     }
 
-    // Metodo che restituisce la lunghezza della sequenza esadecimale.
+    // Method that returns the length of the hexadecimal sequence.
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
-    // Metodo che converte l'oggetto `Hex` in un vettore di bytes.
+    // Method that converts the `Hex` object into a byte vector.
     pub fn to_bytes(&self) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Decodifica la stringa esadecimale in bytes.
+        // Decodes the hexadecimal string into bytes.
         match hex::decode(&self.0) {
-            // Se la decodifica va a buon fine, restituisci i bytes ottenuti.
+            // If decoding is successful, return the obtained bytes.
             Ok(v) => Ok(v),
-            // Se c'è un errore durante la decodifica, restituisci un errore di tipo `JlmCryptoErrors`.
+            // If there is an error during decoding, return a `JlmCryptoErrors` error.
             Err(_) => Err(JlmCryptoErrors::InvalidHEXToBytesConversion),
         }
     }
 
-    // Metodo che converte l'oggetto `Hex` in un oggetto `Base64`.
+    // Method that converts the `Hex` object into a `Base64` object.
     pub fn to_b64(&self) -> Result<Base64, JlmCryptoErrors> {
-        // Converte l'oggetto `Hex` in un vettore di bytes e quindi in un oggetto `Base64`.
+        // Converts the `Hex` object into a byte vector and then into a `Base64` object.
         match &self.to_bytes() {
             Ok(v) => Ok(Base64::from_string(base64::encode(v))),
-            // Se c'è un errore nella conversione, restituisci un errore di tipo `JlmCryptoErrors`.
+            // If there is an error during conversion, return a `JlmCryptoErrors` error.
             Err(_) => Err(JlmCryptoErrors::InvalidHEXToBase64Conversion),
         }
     }
 }
 
-// Implementazione del trait `FromStr` per la struttura `Hex`.
+// Implementation of the `FromStr` trait for the `Hex` structure.
 impl FromStr for Hex {
     type Err = JlmCryptoErrors;
 
-    // Metodo che converte una stringa in un oggetto `Hex`.
+    // Method that converts a string into a `Hex` object.
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        // Chiama il metodo `from_hex_string` della struttura `Hex` per creare un oggetto `Hex` dalla stringa.
+        // Calls the `from_hex_string` method of the `Hex` structure to create a `Hex` object from the string.
         Hex::from_hex_string(s.to_string())
     }
 }
 
-// Definizione della struttura `Base64`.
+// Definition of the `Base64` structure.
 impl Base64 {
-    // Costruttore per creare un nuovo oggetto `Base64` da una stringa.
+    // Constructor to create a new `Base64` object from a string.
     pub fn new(s: String) -> Base64 {
         Base64(s)
     }
 
-    // Metodo che crea un oggetto `Base64` da una stringa.
+    // Method that creates a `Base64` object from a string.
     pub fn from_string(s: String) -> Base64 {
         Base64(s)
     }
 
-    // Metodo che crea un oggetto `Base64` da un vettore di bytes.
+    // Method that creates a `Base64` object from a byte vector.
     pub fn from_bytes(s: &[u8]) -> Base64 {
         Base64(base64::encode(s))
     }
 
-    // Metodo che converte l'oggetto `Base64` in un vettore di bytes.
+    // Method that converts the `Base64` object into a byte vector.
     pub fn to_bytes(&self) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Decodifica la stringa Base64 in bytes.
+        // Decodes the Base64 string into bytes.
         match base64::decode(&self.0) {
-            // Se la decodifica va a buon fine, restituisci i bytes ottenuti.
+            // If decoding is successful, return the obtained bytes.
             Ok(r) => Ok(r),
-            // Se c'è un errore durante la decodifica, restituisci un errore di tipo `JlmCryptoErrors`.
+            // If there is an error during decoding, return a `JlmCryptoErrors` error.
             Err(_) => Err(JlmCryptoErrors::InvalidBase64ToBytes),
         }
     }
 }
 
-// Implementazione del trait `PartialEq` per la struttura `Base64`.
+// Implementation of the `PartialEq` trait for the `Base64` structure.
 impl PartialEq for Base64 {
-    // Metodo che confronta due oggetti `Base64` per uguaglianza.
+    // Method that compares two `Base64` objects for equality.
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
     }
 }
 
-// Implementazione del trait `PartialEq` per la struttura `Hex`.
+// Implementation of the `PartialEq` trait for the `Hex` structure.
 impl PartialEq for Hex {
-    // Metodo che confronta due oggetti `Hex` per uguaglianza.
+    // Method that compares two `Hex` objects for equality.
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
     }
 }
 
-// Implementazione del trait `Display` per la struttura `Hex`.
+// Implementation of the `Display` trait for the `Hex` structure.
 impl<'a> fmt::Display for Hex {
-    // Metodo che formatta l'oggetto `Hex` per la visualizzazione.
+    // Method that formats the `Hex` object for display.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-// Implementazione del trait `Debug` per la struttura `Hex`.
+// Implementation of the `Debug` trait for the `Hex` structure.
 impl<'a> fmt::Debug for Hex {
-    // Metodo che formatta l'oggetto `Hex` per la visualizzazione in modalità di debug.
+    // Method that formats the `Hex` object for display in debug mode.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // Formatta la stringa esadecimale in un formato leggibile, separando le coppie di cifre con uno spazio.
+        // Formats the hexadecimal string into a readable format, separating pairs of digits with a space.
         let hex_string = self.0.to_lowercase();
         let spaced_hex_string = hex_string
             .chars()
             .enumerate()
             .flat_map(|(i, c)| {
                 if i > 0 && i % 2 == 0 {
-                    Some(' ') // Inserisci uno spazio dopo ogni coppia di cifre
+                    Some(' ') // Insert a space after every pair of digits
                 } else {
                     None
                 }
@@ -795,35 +795,35 @@ impl<'a> fmt::Debug for Hex {
     }
 }
 
-// Implementazione del trait `Display` per la struttura `Base64`.
+// Implementation of the `Display` trait for the `Base64` structure.
 impl<'a> fmt::Display for Base64 {
-    // Metodo che formatta l'oggetto `Base64` per la visualizzazione.
+    // Method that formats the `Base64` object for display.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0)
     }
 }
 
-// Implementazione del trait `Debug` per la struttura `Base64`.
+// Implementation of the `Debug` trait for the `Base64` structure.
 impl<'a> fmt::Debug for Base64 {
-    // Metodo che formatta l'oggetto `Base64` per la visualizzazione in modalità di debug.
+    // Method that formats the `Base64` object for display in debug mode.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Base64({})", self.0)
     }
 }
 
 impl CryptoVec for Vec<u8> {
-    // Funzione per aggiungere il padding PKCS7 ad un vettore di byte.
+    // Function to add PKCS7 padding to a byte vector.
     fn pad(&mut self, k: u8) -> Result<bool, JlmCryptoErrors> {
-        // Verifica se il valore di padding k è minore di 2
+        // Check if the padding value k is less than 2
         if k < 2 {
-            // Se k è minore di 2, restituisci un errore che indica un fallimento del padding PKCS7
+            // If k is less than 2, return an error indicating PKCS7 padding failure
             return Err(JlmCryptoErrors::PKCS7PaddingFailed);
         }
 
-        // Calcola il valore di padding p necessario per raggiungere un multiplo di k
+        // Calculate the padding value p needed to reach a multiple of k
         let p = k - (self.len() % k as usize) as u8;
 
-        // Aggiungi il valore di padding p al vettore p volte
+        // Add the padding value p to the vector p times
         for _ in 0..p {
             self.push(p);
         }
@@ -831,54 +831,54 @@ impl CryptoVec for Vec<u8> {
         Ok(true)
     }
 
-    // Funzione per rimuovere il padding PKCS7 da un vettore di byte.
+    // Function to remove PKCS7 padding from a byte vector.
     fn unpad(&mut self, k: u8) -> Result<bool, JlmCryptoErrors> {
-        // Verifica se il padding è valido utilizzando la funzione check_padding_valid
+        // Check if the padding is valid using the check_padding_valid function
         if !self.check_padding_valid(k)? {
-            // Se il padding non è valido, restituisci un errore che indica un padding non valido
+            // If the padding is not valid, return an error indicating invalid padding
             return Err(JlmCryptoErrors::InvalidPadding);
         }
 
-        // Calcola la nuova lunghezza del vettore dopo aver rimosso il padding
+        // Calculate the new length of the vector after removing the padding
         let len_new = self.len() - self[self.len() - 1] as usize;
 
-        // Tronca il vettore alla nuova lunghezza per rimuovere il padding
+        // Truncate the vector to the new length to remove the padding
         self.truncate(len_new);
 
-        // Restituisci Ok(true) per indicare la rimozione del padding avvenuta con successo
+        // Return Ok(true) to indicate successful padding removal
         Ok(true)
     }
 
-    // Funzione per verificare se il padding PKCS7 in un vettore di byte è valido.
+    // Function to check if PKCS7 padding in a byte vector is valid.
     fn check_padding_valid(&self, k: u8) -> Result<bool, JlmCryptoErrors> {
-        // Verifica se il valore di padding k è minore di 2
+        // Check if the padding value k is less than 2
         if k < 2 {
-            // Se k è minore di 2, restituisci un errore che indica un padding non valido
+            // If k is less than 2, return an error indicating invalid padding
             return Err(JlmCryptoErrors::InvalidPadding);
         }
 
-        // Verifica se il vettore è vuoto o non è un multiplo di k
+        // Check if the vector is empty or not a multiple of k
         if self.is_empty() || self.len() % k as usize != 0 {
-            // Se il vettore è vuoto o non è un multiplo di k, restituisci false (padding non valido)
+            // If the vector is empty or not a multiple of k, return false (invalid padding)
             return Err(JlmCryptoErrors::InvalidPadding);
         }
 
-        // Ottieni l'ultimo byte del vettore, che indica la quantità di padding
+        // Get the last byte of the vector, which indicates the amount of padding
         let padding = self[self.len() - 1];
 
-        // Verifica se il valore di padding è all'interno dell'intervallo previsto [1, k]
+        // Check if the padding value is within the expected range [1, k]
         if !(1 <= padding && padding <= k) {
-            // Se il valore di padding non è all'interno dell'intervallo previsto, restituisci false (padding non valido)
+            // If the padding value is not within the expected range, return false (invalid padding)
             return Err(JlmCryptoErrors::InvalidPadding);
         }
 
-        // Verifica se i byte di padding sono consistenti con il valore atteso
-        // Confronta gli ultimi `padding` byte con il valore di padding
+        // Check if the padding bytes are consistent with the expected value
+        // Compare the last `padding` bytes with the padding value
         let is_valid = self[self.len() - padding as usize..]
             .iter()
             .all(|&b| b == padding);
 
-        // Restituisci se il padding è valido
+        // Return whether the padding is valid
         if is_valid {
             return Ok(true);
         } else {
@@ -886,24 +886,24 @@ impl CryptoVec for Vec<u8> {
         }
     }
 
-    // Funzione per trovare la dimensione della chiave (ks) più probabile.
+    // Function to find the most likely key size (ks).
     fn find_ks(&self) -> Result<usize, JlmCryptoErrors> {
-        // Inizializza una variabile per la dimensione della chiave (ks) e una per la distanza minima.
+        // Initialize a variable for the key size (ks) and one for the minimum distance.
         let mut out_keysize: Option<usize> = None;
         let mut out_dist = f64::INFINITY;
 
-        // Itera attraverso possibili dimensioni della chiave da 2 a 39 (incluso).
+        // Iterate over possible key sizes from 2 to 39 (inclusive).
         for ks in 2..40 {
-            // Dividi i dati in blocchi di dimensione ks.
+            // Divide the data into chunks of size ks.
             let chunks: Vec<&[u8]> = self.chunks(ks).collect();
 
-            // Estrai i primi quattro blocchi per calcolare le distanze tra di essi.
+            // Extract the first four chunks to calculate the distances between them.
             let block1 = chunks.get(0).unwrap().to_vec();
             let block2 = chunks.get(1).unwrap().to_vec();
             let block3 = chunks.get(2).unwrap().to_vec();
             let block4 = chunks.get(3).unwrap().to_vec();
 
-            // Calcola la distanza normalizzata tra tutti i possibili coppie di blocchi.
+            // Calculate the normalized distance between all possible pairs of blocks.
             let ds = (&block1.compute_distance_bytes(&block2)
                 + &block1.compute_distance_bytes(&block3)
                 + &block1.compute_distance_bytes(&block4)
@@ -912,7 +912,7 @@ impl CryptoVec for Vec<u8> {
                 + &block3.compute_distance_bytes(&block4)) as f64
                 / (6.0 * ks as f64);
 
-            // Aggiorna la dimensione della chiave (ks) e la distanza minima se necessario.
+            // Update the key size (ks) and minimum distance if necessary.
             if out_keysize.is_some() {
                 if ds < out_dist {
                     out_dist = ds;
@@ -924,16 +924,16 @@ impl CryptoVec for Vec<u8> {
             }
         }
 
-        // Restituisci la dimensione della chiave (ks) più probabile.
+        // Return the most likely key size (ks).
         if let Some(ks) = out_keysize {
             Ok(ks)
         } else {
-            // Se non è possibile trovare una dimensione della chiave valida, restituisci un errore.
+            // If a valid key size cannot be found, return an error.
             Err(JlmCryptoErrors::UnableFindKs)
         }
     }
 
-    // Funzione per eseguire un'operazione XOR tra due vettori di byte.
+    // Function to perform an XOR operation between two byte vectors.
     fn xor(&self, v2: Vec<u8>) -> Vec<u8> {
         self.iter().zip(v2.iter()).map(|(&x, &y)| x ^ y).collect()
     }
@@ -947,7 +947,7 @@ impl CryptoVec for Vec<u8> {
         }
     }
 
-    // Funzione per calcolare la distanza di Hamming tra due vettori di byte.
+    // Function to compute the Hamming distance between two byte vectors.
     fn compute_distance_bytes(&self, bytes_b: &Vec<u8>) -> u32 {
         self.iter()
             .zip(bytes_b.iter())
@@ -956,9 +956,10 @@ impl CryptoVec for Vec<u8> {
             })
     }
 
-    // Funzione per valutare il punteggio di un vettore di byte in base alle frequenze delle lettere.
+    // Function to evaluate the score of a byte vector based on letter frequencies.
+
     fn evaluate_score(&self) -> Option<f64> {
-        // Verifica se tutti i caratteri della stringa sono caratteri ASCII stampabili o spazi bianchi.
+        // Check if all characters in the string are printable ASCII characters or whitespace.
         if !self
             .iter()
             .all(|b| b.is_ascii_graphic() || b.is_ascii_whitespace())
@@ -966,7 +967,7 @@ impl CryptoVec for Vec<u8> {
             return None;
         }
 
-        // Calcola il punteggio valutando le frequenze delle lettere nei caratteri alfabeticamente ASCII.
+        // Calculate the score by evaluating the frequencies of letters in the ASCII alphabetic characters.
         Some(self.iter().fold(0.0, |score, b| {
             if b.is_ascii_alphabetic() {
                 let i = b.to_ascii_lowercase() - (b'a');
@@ -977,20 +978,20 @@ impl CryptoVec for Vec<u8> {
         }))
     }
 
-    // Funzione per eseguire un'operazione XOR tra un vettore di byte e una singola chiave.
+    // Function to perform an XOR operation between a byte vector and a single key.
     fn xor_single(&self, k: u8) -> Vec<u8> {
         self.iter().map(|x| x ^ k).collect()
     }
 
-    // Funzione per eseguire un attacco XOR ripetuto per rompere la chiave di cifratura.
+    // Function to perform a repeated XOR attack to break the encryption key.
     fn repeating_xor_attack(&self) -> Result<String, JlmCryptoErrors> {
-        // Trova la dimensione della chiave (ks) più probabile.
+        // Find the most likely key size (ks).
         let ks = self.find_ks().unwrap();
 
-        // Inizializza una matrice transposta per i blocchi di dati.
+        // Initialize a transposed matrix for the data blocks.
         let mut transposed: Vec<Vec<u8>> = vec![vec![]; ks];
 
-        // Estrai i blocchi di dati dalla dimensione della chiave (ks).
+        // Extract the data blocks from the key size (ks).
         for slice in self.chunks(ks) {
             let s_len = slice.len();
             if s_len == ks {
@@ -1000,10 +1001,10 @@ impl CryptoVec for Vec<u8> {
             }
         }
 
-        // Inizializza un vettore per la chiave di decifrazione.
+        // Initialize a vector for the decryption key.
         let mut k_vec: Vec<u8> = Vec::new();
 
-        // Esegui l'attacco XOR ripetuto sui blocchi di dati.
+        // Perform the repeated XOR attack on the data blocks.
         for bl in transposed {
             match bl.evaluate_frequency() {
                 Some((_, key, _)) => k_vec.push(key),
@@ -1011,7 +1012,7 @@ impl CryptoVec for Vec<u8> {
             }
         }
 
-        // Se la chiave è stata determinata, decifra il testo cifrato e restituisci il risultato.
+        // If the key has been determined, decrypt the ciphertext and return the result.
         if k_vec.len() > 0 {
             let repeating_key_xor_result = self.repeating_key_xor(&k_vec);
 
@@ -1025,193 +1026,193 @@ impl CryptoVec for Vec<u8> {
     }
 
     fn repeating_key_xor(&self, key: &[u8]) -> Vec<u8> {
-        // Creo un vettore vuoto per immagazzinare il risultato
+        // Create an empty vector to store the result
         let mut result: Vec<u8> = Vec::new();
 
-        // Creo un iteratore ciclico per la chiave fornita
+        // Create a cyclic iterator for the provided key
         let mut key_iterator = key.into_iter().cycle();
 
-        // Itero attraverso gli elementi del dato di input
+        // Iterate over the elements of the input data
         for i in self.into_iter() {
-            // Eseguo un'operazione di XOR tra l'elemento del dato e il prossimo elemento della chiave
-            // e aggiungo il risultato al vettore di risultati
+            // Perform an XOR operation between the data element and the next element of the key
+            // and add the result to the result vector
             result.push(key_iterator.next().unwrap() ^ i);
         }
 
-        // Restituisco il vettore risultante
+        // Return the resulting vector
         result
     }
 
     fn evaluate_frequency(&self) -> Option<(f64, u8, Vec<u8>)> {
-        // Creo un vettore per memorizzare i risultati di XOR singoli
+        // Create a vector to store the results of single XORs
         let mut xors_vector: Vec<SingleXorRow> = Vec::new();
 
-        // Itero attraverso tutti i possibili valori di chiave (da 0 a 255)
+        // Iterate over all possible key values (from 0 to 255)
         for key in 0..=255 {
-            // Calcolo il risultato XOR singolo per la chiave corrente
+            // Calculate the single XOR result for the current key
             let item = SingleXorRow {
                 key,
                 xor_value: self.xor_single(key),
             };
-            // Aggiungo il risultato XOR singolo al vettore
+            // Add the single XOR result to the vector
             xors_vector.push(item);
         }
 
-        // Filtraggio dei risultati con punteggio positivo
+        // Filter the results with positive scores
         let filtered_map = xors_vector.iter().filter_map(|row| {
             row.xor_value
                 .evaluate_score()
                 .map(|score| (score, row.key, row.xor_value.clone()))
         });
 
-        // Estraggo il valore XOR con il punteggio più alto
+        // Extract the XOR value with the highest score
         let max_value = filtered_map.max_by(|(a, _, _), (b, _, _)| a.partial_cmp(b).unwrap());
 
-        // Restituisco il risultato con il punteggio più alto (se presente)
+        // Return the result with the highest score (if present)
         max_value
     }
 
     fn legacy_cbc_decrypt(&self, key: &[u8], iv: &mut [u8]) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Definisco la dimensione di un blocco (tipicamente 16 byte)
+        // Define the block size (typically 16 bytes)
         let block_size = 16;
 
-        // Creo un vettore per contenere il testo in chiaro decrittografato
+        // Create a vector to hold the decrypted plaintext
         let mut plaintext = Vec::new();
 
-        // Creo un vettore per mantenere il blocco cifrato precedente (inizializzato con l'IV)
+        // Create a vector to hold the previous ciphertext block (initialized with the IV)
         let mut prev_ciphertext_block = iv.to_vec();
 
-        // Itero attraverso i dati cifrati in blocchi della dimensione del blocco
+        // Iterate over the ciphertext data in blocks of the defined block size
         for chunk in self.chunks(block_size) {
-            // Decifro il blocco corrente utilizzando l'algoritmo di cifratura a blocchi (presumibilmente AES-ECB)
+            // Decrypt the current block using the block cipher algorithm (presumably AES-ECB)
             let decrypted_block = chunk.to_vec().ssl_ecb_decrypt(key, Some(false)).unwrap();
 
-            // Effettuo un'operazione di XOR tra il blocco decifrato corrente e il blocco cifrato precedente
+            // Perform an XOR operation between the current decrypted block and the previous ciphertext block
             let mut decrypted_block_xor = Vec::with_capacity(block_size);
             for j in 0..block_size {
-                // Eseguo XOR tra i byte del blocco corrente e quelli del blocco cifrato precedente
+                // Perform XOR between the bytes of the current block and those of the previous ciphertext block
                 decrypted_block_xor.push(decrypted_block[j] ^ prev_ciphertext_block[j]);
             }
 
-            // Aggiorno il blocco cifrato precedente con il blocco corrente
+            // Update the previous ciphertext block with the current block
             prev_ciphertext_block = chunk.to_vec();
 
-            // Aggiungo il risultato dell'operazione XOR al vettore del testo in chiaro
+            // Add the result of the XOR operation to the plaintext vector
             plaintext.extend_from_slice(&decrypted_block_xor);
         }
 
-        // Rimuovo il padding dall'output del decrittografia
+        // Remove padding from the decryption output
         let _ = plaintext.unpad(16);
 
-        // Restituisco il testo in chiaro decrittografato
+        // Return the decrypted plaintext
         Ok(plaintext)
     }
 
-    // Esegue la cifratura utilizzando la modalità di crittografia CBC (Cipher Block Chaining).
+    // Execute encryption using the AES algorithm in CBC mode.
     fn ssl_cbc_encrypt(
         &self,
-        key: &[u8],        // Chiave di crittografia
-        iv: &[u8],         // Vettore di inizializzazione (IV)
-        pad: Option<bool>, // Opzione per il padding (opzionale, default: true)
+        key: &[u8],        // Encryption key
+        iv: &[u8],         // Initialization vector (IV)
+        pad: Option<bool>, // Padding option (optional, default: true)
     ) -> Result<Vec<u8>, JlmCryptoErrors> {
-        let cipher = Cipher::aes_128_cbc(); // Utilizza l'algoritmo AES con modalità CBC
+        let cipher = Cipher::aes_128_cbc(); // Use AES algorithm in CBC mode
 
         let mut crypter = Crypter::new(cipher, Mode::Encrypt, key, Some(iv)).unwrap();
-        crypter.pad(pad.unwrap_or(true)); // Abilita il padding, se specificato
+        crypter.pad(pad.unwrap_or(true)); // Enable padding if specified
 
-        // Crea un vettore per immagazzinare il testo cifrato
+        // Create a vector to hold the encrypted ciphertext
         let mut encrypted = vec![0; &self.len() + cipher.block_size()];
 
-        // Esegue la cifratura
+        // Perform the encryption
         let count = crypter.update(&self, &mut encrypted).unwrap();
 
         match crypter.finalize(&mut encrypted[count..]) {
             Ok(final_count_value) => {
-                // Tronca il vettore del testo cifrato alla lunghezza effettiva
+                // Truncate the ciphertext vector to the actual length
                 encrypted.truncate(count + final_count_value);
 
-                // Restituisce il testo cifrato risultante
+                // Return the resulting ciphertext
                 Ok(encrypted)
             }
             Err(_) => Err(JlmCryptoErrors::InvalidPadding),
         }
     }
 
-    // Esegue la cifratura utilizzando la modalità di crittografia ECB (Electronic Codebook).
+    // Execute encryption using the AES algorithm in ECB mode.
     fn ssl_ecb_encrypt(
         &self,
-        key: &[u8],        // Chiave di crittografia
-        pad: Option<bool>, // Opzione per il padding (opzionale, default: true)
+        key: &[u8],        // Encryption key
+        pad: Option<bool>, // Padding option (optional, default: true)
     ) -> Result<Vec<u8>, JlmCryptoErrors> {
-        let cipher = Cipher::aes_128_ecb(); // Utilizza l'algoritmo AES con modalità ECB
+        let cipher = Cipher::aes_128_ecb(); // Use AES algorithm in ECB mode
         let mut crypter = Crypter::new(cipher, Mode::Encrypt, key, None).unwrap();
-        crypter.pad(pad.unwrap_or(true)); // Abilita il padding, se specificato
+        crypter.pad(pad.unwrap_or(true)); // Enable padding if specified
 
-        // Crea un vettore per immagazzinare il testo cifrato
+        // Create a vector to hold the encrypted ciphertext
         let mut encrypted = vec![0; &self.len() + cipher.block_size()];
 
-        // Esegue la cifratura
+        // Perform the encryption
         let count = crypter.update(&self, &mut encrypted).unwrap();
         let final_count = crypter.finalize(&mut encrypted[count..]).unwrap();
 
-        // Tronca il vettore del testo cifrato alla lunghezza effettiva
+        // Truncate the ciphertext vector to the actual length
         encrypted.truncate(count + final_count);
 
-        // Restituisce il testo cifrato risultante
+        // Return the resulting ciphertext
         Ok(encrypted)
     }
 
-    // Esegue la decifratura utilizzando la modalità di crittografia ECB (Electronic Codebook).
+    // Execute decryption using the AES algorithm in ECB mode.
     fn ssl_ecb_decrypt(
         &self,
-        key: &[u8],        // Chiave di crittografia
-        pad: Option<bool>, // Opzione per il padding (opzionale, default: true)
+        key: &[u8],        // Encryption key
+        pad: Option<bool>, // Padding option (optional, default: true)
     ) -> Result<Vec<u8>, JlmCryptoErrors> {
-        let cipher = Cipher::aes_128_ecb(); // Utilizza l'algoritmo AES con modalità ECB
+        let cipher = Cipher::aes_128_ecb(); // Use AES algorithm in ECB mode
         let mut crypter = Crypter::new(cipher, Mode::Decrypt, key, None).unwrap();
-        crypter.pad(pad.unwrap_or(true)); // Abilita il padding, se specificato
+        crypter.pad(pad.unwrap_or(true)); // Enable padding if specified
 
-        // Crea un vettore per immagazzinare il testo decifrato
+        // Create a vector to hold the decrypted plaintext
         let mut decrypted = vec![0; &self.len() + cipher.block_size()];
 
-        // Esegue la decifratura
+        // Perform the decryption
         let count = crypter.update(&self, &mut decrypted).unwrap();
 
         match crypter.finalize(&mut decrypted[count..]) {
             Ok(final_count_value) => {
-                // Tronca il vettore del testo decifrato alla lunghezza effettiva
+                // Truncate the decrypted plaintext vector to the actual length
                 decrypted.truncate(count + final_count_value);
 
-                // Restituisce il testo decifrato risultante
+                // Return the resulting plaintext
                 Ok(decrypted)
             }
             Err(_) => Err(JlmCryptoErrors::InvalidPadding),
         }
     }
 
-    // Esegue la decifratura utilizzando la modalità di crittografia CBC (Cipher Block Chaining).
+    // Execute decryption using the AES algorithm in CBC mode.
     fn ssl_cbc_decrypt(
         &self,
-        key: &[u8],        // Chiave di crittografia
-        iv: &[u8],         // Vettore di inizializzazione (IV)
-        pad: Option<bool>, // Opzione per il padding (opzionale, default: true)
+        key: &[u8],        // Encryption key
+        iv: &[u8],         // Initialization vector (IV)
+        pad: Option<bool>, // Padding option (optional, default: true)
     ) -> Result<Vec<u8>, JlmCryptoErrors> {
-        let cipher = Cipher::aes_128_cbc(); // Utilizza l'algoritmo AES con modalità CBC
+        let cipher = Cipher::aes_128_cbc(); // Use AES algorithm in CBC mode
         let mut crypter = Crypter::new(cipher, Mode::Decrypt, key, Some(iv)).unwrap();
-        crypter.pad(pad.unwrap_or(true)); // Abilita il padding, se specificato
+        crypter.pad(pad.unwrap_or(true)); // Enable padding if specified
 
-        // Crea un vettore per immagazzinare il testo decifrato
+        // Create a vector to hold the decrypted plaintext
         let mut decrypted = vec![0; &self.len() + cipher.block_size()];
 
-        // Esegue la decifratura
+        // Perform the decryption
         match crypter.update(&self, &mut decrypted) {
             Ok(count) => {
                 match crypter.finalize(&mut decrypted[count..]) {
                     Ok(final_count_value) => {
-                        // Tronca il vettore del testo decifrato alla lunghezza effettiva
+                        // Truncate the decrypted plaintext vector to the actual length
                         decrypted.truncate(count + final_count_value);
 
-                        // Restituisce il testo decifrato risultante
+                        // Return the resulting plaintext
                         Ok(decrypted)
                     }
                     Err(_) => Err(JlmCryptoErrors::InvalidPadding),
@@ -1222,29 +1223,30 @@ impl CryptoVec for Vec<u8> {
     }
 
     fn ssl_ctr_encrypt(&self, key: &[u8], pad: Option<bool>) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Inizializza il vettore che conterrà il testo cifrato.
+        // Initialize the vector that will hold the ciphertext.
         let mut ciphertext = Vec::new();
-        // Inizializza il vettore che rappresenta lo stream di chiavi per la cifratura.
+        // Initialize the vector that represents the keystream for encryption.
         let mut keystream = vec![0; 16];
 
         /*
-         * Il keystream è una sequenza che viene utilizzata per generare un
-         * primo blocco cifrato. Questo primo blocco viene poi usato per
-         * effettuare uno xor tra un blocco del testo in chiaro e
-         * un blocco del keystream.
-         * Per ogni blocco il valore "contatore" del primo blocco
-         * del keystream viene incrementato.
+        They keystream is a sequence that is used to generate an
+        initial encrypted block. This first block is then used to
+        perform an XOR operation between a block of plaintext and
+        a block of the keystream.
+        For each block, the "counter" value of the first block
+        of the keystream is incremented.
          */
 
-        // Itera sui blocchi di 16 byte del messaggio in input.
+        // Iterates over the input data in chunks of 16 bytes.
+        // Each chunk represents a block of data to be encrypted.
         for b in self.chunks(16) {
-            // Ottiene lo stream di chiavi cifrando il keystream con la chiave usando la modalità ECB.
+            // Gets the keystream by encrypting the keystream with the key using ECB mode.
             let to_xor = keystream.to_vec().ssl_ecb_encrypt(&key, pad);
 
-            // Esegue l'operazione XOR tra il blocco corrente e lo stream di chiavi ottenuto.
+            // Performs the XOR operation between the current block and the obtained keystream.
             ciphertext.extend_from_slice(&b.to_vec().xor(to_xor.unwrap()));
 
-            // Aggiorna il keystream incrementando il contatore.
+            // Updates the keystream by incrementing the counter.
             for b in keystream[16 / 2..].iter_mut() {
                 *b += 1;
                 if *b != 0 {
@@ -1253,7 +1255,7 @@ impl CryptoVec for Vec<u8> {
             }
         }
 
-        // Restituisce il testo cifrato.
+        // Returns the ciphertext.
         Ok(ciphertext)
     }
 
@@ -1262,46 +1264,46 @@ impl CryptoVec for Vec<u8> {
     }
 
     fn nonce_ctr_encrypt(&self, key: &[u8], nonce: Vec<u8>) -> Result<Vec<u8>, JlmCryptoErrors> {
-        // Ottieni la lunghezza del blocco dalla lunghezza della chiave
+        // Get the block size from the key length
         let block_size = key.len();
 
-        // Inizializza un encryptor AES con chiave 128-bit
+        // Initialize an AES encryptor with a 128-bit key
         let encryptor = aessafe::AesSafe128Encryptor::new(&key);
 
-        // Inizializza un vettore per contenere il risultato crittografico
+        // Initialize a vector to hold the ciphertext
         let mut result: Vec<u8> = Vec::new();
 
-        // Divide i dati in blocchi della dimensione del blocco AES
+        // Divide the data into blocks of the AES block size
         let i_blocks = &self.chunks(block_size);
 
-        // Inizializza un vettore per contenere lo stream di chiavi
+        // Initialize a vector to hold the keystream
         let mut keystream = vec![0; block_size];
 
-        // Itera attraverso i blocchi di dati e crittografa ciascun blocco
+        // Iterate over the data blocks and encrypt each block
         for (count, block) in i_blocks.clone().enumerate() {
-            // Inizializza un vettore per contenere il nonce e il contatore
+            // Initialize a vector to hold the nonce and counter
             let mut nonce_count = Vec::new();
             nonce_count.extend_from_slice(&nonce[..]);
 
-            // Controlla se la scrittura del contatore nel nonce_count è riuscita
+            // Check if writing the counter to nonce_count was successful
             if let Ok(_) = nonce_count.write_u64::<LittleEndian>(count as u64) {
-                // Cripta il nonce_count per ottenere lo stream di chiavi
+                // Encrypt the nonce_count to obtain the keystream
                 encryptor.encrypt_block(&nonce_count[..], &mut keystream[..]);
 
-                // Esegue l'operazione XOR tra lo stream di chiavi e il blocco corrente
+                // Perform the XOR operation between the keystream and the current block
                 let b1 = &keystream[0..block.len()];
                 let b2 = block;
                 let x_result = b1.to_vec().xor(b2.to_vec());
 
-                // Aggiungi il risultato crittografico al vettore di risultato
+                // Add the ciphertext result to the result vector
                 result.extend_from_slice(&x_result[..]);
             } else {
-                // Se la scrittura del contatore fallisce, restituisci un errore
+                // If writing the counter fails, return an error
                 return Err(JlmCryptoErrors::FailedAesCtrEncrypt);
             }
         }
 
-        // Restituisci il risultato crittografico
+        // Return the ciphertext result
         Ok(result)
     }
 }
