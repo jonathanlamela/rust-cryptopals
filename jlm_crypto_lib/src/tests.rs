@@ -13,10 +13,10 @@ mod tests {
     use std::io::BufReader;
     use std::str;
 
-    // Testa la funzione di conversione da Hex a Base64.
+    // Test the conversion from Hex to Base64.
     #[test]
     fn set_1_challenge_1() {
-        // Confronta il risultato dell'operazione con un valore atteso.
+        // Compare the result of the operation with an expected value.
         assert_eq!(
             Hex::from_string(String::from("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d"))
                 .unwrap()
@@ -28,37 +28,37 @@ mod tests {
         );
     }
 
-    // Testa l'operazione di XOR tra due valori Hex.
+    // Test the XOR operation between two Hex values.
     #[test]
     fn set_1_challenge_2() {
-        // Crea istanze Hex dai valori forniti.
+        // Create Hex instances from the provided values.
         let hex1 = Hex::from_string(String::from("1c0111001f010100061a024b53535009181c")).unwrap();
         let hex2 = Hex::from_string(String::from("686974207468652062756c6c277320657965")).unwrap();
 
-        // Converti Hex in byte array.
+        // Convert Hex to byte array.
         let bytes1 = hex1.to_bytes().unwrap_or_else(|err| {
-            panic!("Errore nella conversione da Hex a byte: {:?}", err);
+            panic!("Error converting from Hex to byte: {:?}", err);
         });
         let bytes2 = hex2.to_bytes().unwrap_or_else(|err| {
-            panic!("Errore nella conversione da Hex a byte: {:?}", err);
+            panic!("Error converting from Hex to byte: {:?}", err);
         });
 
-        // Esegui XOR tra i byte array.
+        // Perform XOR between the byte arrays.
         let xor_result = bytes1.xor(bytes2);
 
-        // Crea un valore Hex atteso dal risultato dell'XOR.
+        // Create an expected Hex value from the XOR result.
         let expected_result =
             Hex::from_string(String::from("746865206b696420646f6e277420706c6179")).unwrap();
 
-        // Converti il risultato dell'XOR in Hex e confrontalo con il valore atteso.
+        // Convert the XOR result to Hex and compare it with the expected value.
         let result = Hex::from_bytes(xor_result).unwrap();
         assert_eq!(result, expected_result);
     }
 
-    // Testa la decrittografia di un testo cifrato XOR con una chiave singola.
+    // Test the decryption of an XOR encrypted text with a single key.
     #[test]
     fn set_1_challenge_3() {
-        // Decifra un testo cifrato XOR e verifica il risultato.
+        // Decrypt an XOR encrypted text and verify the result.
         let result = Hex::from_string(String::from(
             "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736",
         ))
@@ -68,34 +68,34 @@ mod tests {
         .evaluate_frequency()
         .unwrap();
 
-        // Confronta il risultato con un valore atteso.
+        // Compare the result with an expected value.
         let stringa = String::from_utf8(result.2).unwrap();
         assert_eq!(stringa, "Cooking MC's like a pound of bacon");
     }
 
-    // Testa la decifrazione di testi cifrati XOR per trovare il testo in chiaro corretto.
+    // Test the decryption of XOR encrypted texts to find the correct plaintext.
     #[test]
     fn set_1_challenge_4() {
-        // Legge il file contenente i testi cifrati XOR.
+        // Read the file containing the XOR encrypted texts.
         let file_path = "./data/data_4.txt";
-        let file = File::open(file_path).expect("Impossibile leggere il file");
+        let file = File::open(file_path).expect("Unable to read file");
         let buf_reader = BufReader::new(file);
         let mut readed_lines: Vec<(f64, String, Vec<u8>)> = Vec::new();
 
-        // Itera sulle linee del file.
+        // Iterate over the lines of the file.
         for line in buf_reader.lines() {
             if line.is_ok() {
                 let unwrapped_line = line.unwrap();
 
-                // Crea un'istanza Hex dalla linea letta e converte in byte array.
+                // Create a Hex instance from the read line and convert it to a byte array.
                 let hex_value = Hex::from_string(unwrapped_line.clone())
-                    .unwrap_or_else(|_| panic!("Conversione da Hex a byte fallita"));
+                    .unwrap_or_else(|_| panic!("Conversion from Hex to byte failed"));
 
                 let bytes = hex_value.to_bytes().unwrap_or_else(|_| {
-                    panic!("Conversione da Hex a byte fallita");
+                    panic!("Conversion from Hex to byte failed");
                 });
 
-                // Calcola la frequenza dei caratteri e memorizza il risultato.
+                // Calculate the character frequency and store the result.
                 match bytes.evaluate_frequency() {
                     Some(result) => {
                         readed_lines.push((result.0, unwrapped_line, result.2));
@@ -105,36 +105,36 @@ mod tests {
             }
         }
 
-        // Verifica se ci sono risultati validi.
+        // Check if there are valid results.
         if readed_lines.len() > 0 {
-            // Trova il risultato con la frequenza massima tra quelli memorizzati.
+            // Find the result with the highest frequency among those stored.
             let value = readed_lines
                 .iter()
                 .min_by(|(a, _, _), (b, _, _)| b.partial_cmp(a).unwrap());
 
             let value_unwrapped = value.unwrap();
 
-            // Converte i byte decifrati in una stringa e confronta con il valore atteso.
+            // Convert the decrypted bytes into a string and compare with the expected value.
             let stringa = str::from_utf8(&value_unwrapped.2).unwrap();
             assert_eq!(stringa, "Now that the party is jumping\n")
         } else {
-            panic!("Test fallito")
+            panic!("Test failed: No valid results found");
         }
     }
 
-    // Testa la crittografia XOR ripetuta di un testo in chiaro.
+    // Test the repeated XOR encryption of a plaintext.
     #[test]
     fn set_1_challenge_5() {
-        // Converte i valori in chiaro e la chiave in byte array.
+        // Convert the plaintext and key into byte arrays.
         let expected_result = Hex::from_string(String::from("0b3637272a2b2e63622c2e69692a23693a2a3c6324202d623d63343c2a26226324272765272a282b2f20430a652e2c652a3124333a653e2b2027630c692b20283165286326302e27282f")).unwrap();
         let clear_text_as_bytes =
             b"Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal".to_vec();
         let clear_key_as_bytes = b"ICE";
 
-        // Esegui la crittografia XOR ripetuta e confronta con il risultato atteso.
+        // Execute the repeated XOR encryption and compare with the expected result.
         let result = clear_text_as_bytes.repeating_key_xor(clear_key_as_bytes);
         let hex_result =
-            Hex::from_bytes(result).unwrap_or_else(|_| panic!("Hex da byte non valido"));
+            Hex::from_bytes(result).unwrap_or_else(|_| panic!("Hex from bytes failed"));
         assert_eq!(expected_result, hex_result);
     }
 
@@ -142,7 +142,7 @@ mod tests {
     fn set_1_challenge_6() {
         let file_path = "./data/data_6.txt";
 
-        //Read the file from path supplied
+        // Read the file from path supplied
         let mut file = File::open(file_path).expect("Unable to read file");
         let mut buffer = Vec::new();
 
@@ -165,50 +165,50 @@ mod tests {
         }
     }
 
-    // Testa la crittografia e decrittografia di un testo utilizzando AES in modalità ECB.
+    // Test the encryption and decryption of a text using AES in ECB mode.
     #[test]
     fn set_1_challenge_7() {
         let expected_result = String::from("testo di prova");
 
-        // Converti il contenuto cifrato da Base64 a Base64.
+        // Convert the encrypted content from Base64 to Base64.
         let encrypted_content = Base64::from_string(String::from("ZlBz+2/3RVo7TTsubWlesA=="));
 
-        // Converti il contenuto cifrato in byte array.
+        // Convert the encrypted content into a byte array.
         let encrypted_bytes = encrypted_content
             .to_bytes()
-            .unwrap_or_else(|_| panic!("Base64 da byte non valido"));
+            .unwrap_or_else(|_| panic!("Base64 to bytes failed"));
 
-        // Decifra il contenuto utilizzando AES in modalità ECB e verifica il risultato.
+        // Decrypt the content using AES in ECB mode and verify the result.
         let decrypted_bytes = encrypted_bytes
             .ssl_ecb_decrypt(b"YELLOW SUBMARINE", Some(true))
             .unwrap();
 
-        // Converte i byte decifrati in una stringa e confronta con il valore atteso.
+        // Convert the decrypted bytes into a string and compare with the expected value.
         let decrypted_string = str::from_utf8(&decrypted_bytes).unwrap().to_string();
         assert_eq!(decrypted_string, expected_result)
     }
 
     #[test]
     fn set_1_challenge_8() {
-        // Apre il file specificato
+        // Open the specified file
         let file_path = "./data/data_8.txt";
-        let file = File::open(file_path).expect("Impossibile leggere il file");
+        let file = File::open(file_path).expect("Unable to read file");
         let buf_reader = BufReader::new(file);
 
-        // Legge il file linea per linea
+        // Read the file line by line
         for line in buf_reader.lines() {
-            // Se la lettura della linea è avvenuta senza errori
+            // If reading the line was successful
             if line.is_ok() {
-                // Ottiene il contenuto della linea
+                // Get the content of the line
                 let unwrapped_line = line.unwrap();
                 let line_bytes = unwrapped_line.as_bytes();
 
-                // Divide i byte della linea in pezzi di 32 byte ciascuno
+                // Divide the line's bytes into chunks of 32 bytes each
                 let mut v_slices: Vec<&[u8]> = line_bytes.chunks(32).collect();
 
-                // Controlla se ci sono pezzi duplicati
+                // Check for duplicate chunks
                 if v_slices.contains_duplicates() {
-                    // Verifica che la linea sia uguale alla stringa fornita
+                    // Verify that the line is equal to the provided string
                     assert_eq!(unwrapped_line,"d880619740a8a19b7840a8a31c810a3d08649af70dc06f4fd5d2d69c744cd283e2dd052f6b641dbf9d11b0348542bb5708649af70dc06f4fd5d2d69c744cd2839475c9dfdbc1d46597949d9c7e82bf5a08649af70dc06f4fd5d2d69c744cd28397a93eab8d6aecd566489154789a6b0308649af70dc06f4fd5d2d69c744cd283d403180c98c8f6db1f2a3f9c4040deb0ab51b29933f2c123c58386b06fba186a")
                 }
             }
@@ -219,13 +219,13 @@ mod tests {
     fn set_2_challenge_9() {
         let size = 20;
 
-        // Stringa da riempire con byte extra
+        // String to pad with extra bytes
         let mut string_to_pad = b"YELLOW SUBMARINE".to_vec();
 
-        // Riempie la stringa fino alla dimensione specificata
+        // Pad the string to the specified size
         string_to_pad.pad(size).unwrap();
 
-        // Verifica che la stringa riempita sia uguale all'array fornito
+        // Verify that the padded string is equal to the provided array
         assert_eq!(
             &string_to_pad,
             [89, 69, 76, 76, 79, 87, 32, 83, 85, 66, 77, 65, 82, 73, 78, 69, 4, 4, 4, 4,].as_ref()
@@ -236,48 +236,47 @@ mod tests {
     fn set_2_challenge_10() {
         let file_path = "./data/data_10.txt";
 
-        // Apre il file specificato
-        let mut file = File::open(file_path).expect("Impossibile leggere il file");
+        // Open the specified file
+        let mut file = File::open(file_path).expect("Unable to read file");
         let mut buffer = Vec::new();
 
-        // Legge il contenuto del file in un buffer
-        file.read_to_end(&mut buffer)
-            .expect("Errore durante la lettura del file.");
+        // Read the content of the file into a buffer
+        file.read_to_end(&mut buffer).expect("Error reading file.");
 
-        // Converti il buffer in una stringa e rimuovi i caratteri di nuova linea
+        // Convert the buffer into a string and remove new line characters
         let buffer_to_string = str::from_utf8(&buffer).unwrap().replace("\n", "");
 
-        // Converte la stringa da Base64 a bytes
+        // Convert the string from Base64 to bytes
         let input = Base64::from_string(buffer_to_string);
         let input_bytes = input
             .to_bytes()
-            .unwrap_or_else(|_| panic!("Base64 non valido"));
+            .unwrap_or_else(|_| panic!("Invalid Base64 to bytes"));
 
-        // Inizializzazione del vettore di inizializzazione (IV)
+        // Initialization vector (IV)
         let iv = &[0; 16];
 
-        // Prova a decifrare i dati usando CBC mode
+        // Try to decrypt the data using CBC mode
         if let Ok(v) = input_bytes.legacy_cbc_decrypt(b"YELLOW SUBMARINE", &mut iv.to_owned()) {
             let result = String::from_utf8(v).unwrap();
 
-            // Verifica che il risultato sia uguale alla stringa fornita
+            // Verify that the result is equal to the provided string
             assert_eq!(YELLOW_SUBMARINE_STRING, result)
         }
     }
 
-    // Testa il rilevamento della modalità di crittografia (ECB o CBC) utilizzata.
+    // Test the detection of the encryption mode (ECB or CBC) used.
     #[test]
     pub fn set_2_challenge_11() {
-        // Crea un'istanza dell'oracolo con crittografia casuale.
+        // Create an instance of the oracle with random encryption.
         let oracle = CustomCrypter11::new();
 
         match oracle {
             Ok(r) => {
-                // Crea un input vuoto e cifra i byte con l'oracolo.
+                // Create an empty input and encrypt the bytes with the oracle.
                 let input: Vec<u8> = vec![0; 48];
                 let encrypted_value = r.base.encrypt(&input).unwrap();
 
-                // Verifica se l'oracolo ha rilevato la modalità corretta.
+                // Verify that the oracle detected the correct mode.
                 if r.is_cbc() {
                     assert_eq!(r.is_ecb_calculated(encrypted_value).unwrap(), false);
                 } else if r.is_ecb() {
@@ -292,26 +291,26 @@ mod tests {
 
     #[test]
     pub fn set_2_challenge_12() {
-        // Crea un'istanza dell'oracle crittografico personalizzato per la sfida 12
+        // Create an instance of the custom cryptographic oracle for challenge 12
         let oracle = CustomCrypter12::new();
 
-        // Suffix in formato Base64 da decodificare
+        // Base64-encoded suffix to decode
         let base64_suffix = Base64::from_string(String::from(
         "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK",
     ));
 
         match oracle {
             Ok(r) => {
-                // Input da crittografare
+                // Input to encrypt
                 let input: Vec<u8> = b"A".to_vec();
 
-                // Ottieni il valore crittografato dell'input
+                // Get the encrypted value of the input
                 let encrypted_value = r.base.encrypt(&input).unwrap();
 
-                // Verifica che la dimensione del valore crittografato sia un multiplo di 16
+                // Verify that the size of the encrypted value is a multiple of 16
                 assert_eq!(encrypted_value.len() % 16, 0);
 
-                // Verifica che il suffisso in formato Base64 sia uguale al suffisso ottenuto dall'oracle
+                // Verify that the Base64-encoded suffix is equal to the suffix obtained from the oracle
                 assert_eq!(
                     base64_suffix,
                     Base64::from_bytes(r.get_suffix().unwrap().as_slice())
@@ -325,28 +324,28 @@ mod tests {
 
     #[test]
     pub fn set_2_challenge_13() {
-        // Crea un'istanza dell'oracolo CustomCrypter13
+        // Create an instance of the oracle CustomCrypter13
         let oracle13 = CustomCrypter13::new().unwrap();
 
-        // Genera un indirizzo malevolo
+        // Generate a malicious address
         let email = &String::from(oracle13.generate_test_email());
 
-        // Crea dati di riempimento
+        // Create padding data
         let junk1: Vec<u8> = vec![65u8; 10];
         let mut admin_with_padding = b"admin".to_vec();
         let padding = vec![11; 11];
 
-        // Aggiungi il padding all'username "admin"
+        // Add padding to the "admin" username
         admin_with_padding.extend_from_slice(&padding[..]);
 
-        // Crea un vettore per i dati di test
+        // Create a vector for the test data
         let mut test_bytes = Vec::new();
 
-        // Aggiungi dati di riempimento e l'username con padding al vettore dei dati di test
+        // Add padding data and the padded username to the test data vector
         test_bytes.extend_from_slice(&junk1[..]);
         test_bytes.extend_from_slice(&admin_with_padding[..]);
 
-        // Genera un cookie con una stringa fasulla per ottenere il valore criptato di "admin"
+        // Generate a cookie with a fake string to obtain the encrypted value of "admin"
         let ciphertext1 = &oracle13
             .encrypt(
                 &oracle13
@@ -356,30 +355,30 @@ mod tests {
             )
             .unwrap();
 
-        // Dividi il valore crittografato in blocchi da 16 byte
+        // Divide the encrypted value into 16-byte chunks
         let mut ciphertext1_chunks = ciphertext1.chunks(16);
 
-        // Genera un cookie con un falso indirizzo email, che contiene il ruolo dell'utente
+        // Generate a cookie with a fake email address, which contains the user's role
         let ciphertext2 = &mut oracle13
             .encrypt(&oracle13.profile_for(email.to_string()).unwrap().as_bytes())
             .unwrap();
 
-        // Ottieni l'ultimo blocco del valore crittografato 1, che contiene il valore criptato di "admin"
+        // Get the last block of the encrypted value 1, which contains the encrypted value of "admin"
         let last_block = ciphertext1_chunks.nth(1).unwrap();
 
-        // Rimuovi tutti i byte dopo la posizione 32 da ciphertext2
+        // Remove all bytes after position 32 from ciphertext2
         ciphertext2.truncate(32);
 
-        // Aggiungi al ciphertext2 i byte dell'ultimo blocco
+        // Add the bytes of the last block to ciphertext2
         ciphertext2.extend_from_slice(&last_block);
 
-        // Decifra il nuovo cookie che dovrebbe contenere il ruolo "admin"
+        // Decrypt the new cookie that should contain the role "admin"
         let new_cookie_decrypted = ciphertext2
             .to_vec()
             .ssl_ecb_decrypt(&oracle13.base.key, Some(true))
             .unwrap();
 
-        // Verifica che il cookie decifrato contenga il ruolo "admin"
+        // Verify that the decrypted cookie contains the role "admin"
         assert!(String::from_utf8(new_cookie_decrypted)
             .unwrap()
             .ends_with("role=admin"));
@@ -387,17 +386,17 @@ mod tests {
 
     #[test]
     pub fn set_2_challenge_14() {
-        // Crea un'istanza dell'oracolo CustomCrypter14
+        // Create an instance of the oracle CustomCrypter14
         let oracle = CustomCrypter14::new();
 
-        // Suffix in formato Base64 da decodificare
+        // Base64-encoded suffix to decode
         let base64_suffix = Base64::from_string(String::from(
             "Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK",
         ));
 
         match oracle {
             Ok(r) => {
-                // Verifica che il suffisso in formato Base64 sia uguale al suffisso ottenuto dall'oracolo
+                // Verify that the Base64-encoded suffix is equal to the suffix obtained from the oracle
                 assert_eq!(
                     base64_suffix,
                     Base64::from_bytes(r.get_suffix().unwrap().as_slice())
@@ -411,135 +410,135 @@ mod tests {
 
     #[test]
     pub fn set_2_challenge_15() {
-        // Stringhe con diversi schemi di padding
+        // Strings with different padding schemes
         let str1 = String::from("ICE ICE BABY\x04\x04\x04\x04");
         let str2 = String::from("ICE ICE BABY\x05\x05\x05\x05");
         let str3 = String::from("ICE ICE BABY\x05\x05\x05\x05");
 
-        // Converti le stringhe in vettori di byte mutabili
+        // Convert the strings into mutable byte vectors
         let mut str1_vec = str1.as_bytes().to_vec();
         let str2_vec = str2.as_bytes().to_vec();
         let str3_vec = str3.as_bytes().to_vec();
 
-        // Verifica se il padding di str1 è valido (ritorna true)
+        // Verify that the padding of str1 is valid (returns true)
         assert_eq!(str1_vec.check_padding_valid(16).unwrap(), true);
 
-        // Verifica se il padding di str2 è invalido (ritorna un errore)
+        // Verify that the padding of str2 is invalid (returns an error)
         assert_eq!(str2_vec.check_padding_valid(16).is_err(), true);
 
-        // Verifica se il padding di str3 è invalido (ritorna un errore)
+        // Verify that the padding of str3 is invalid (returns an error)
         assert_eq!(str3_vec.check_padding_valid(16).is_err(), true);
 
-        // Rimuovi il padding dai dati di str1
+        // Remove padding from str1's data
         let _ = str1_vec.unpad(16);
 
-        // Verifica che la conversione in stringa dei byte di str1 sia "ICE ICE BABY"
+        // Verify that the conversion to string of str1's bytes is "ICE ICE BABY"
         assert_eq!(String::from_utf8(str1_vec).unwrap(), "ICE ICE BABY");
     }
 
     #[test]
     pub fn set_2_challenge_16() {
-        // Dimensione della chiave e del vettore di inizializzazione (IV)
+        // Size of the key
         let key_size: usize = 16;
 
-        // Genera un IV casuale di dimensione key_size
+        // Generate a random IV of size key_size
         let iv: Vec<u8> = key_size.random_block();
 
-        // Genera una chiave casuale di dimensione key_size
+        // Generate a random key of size key_size
         let key = key_size.random_block();
 
-        // Crea un'istanza dell'oracolo CustomCrypter16
+        // Create an instance of the oracle CustomCrypter16
         let oracle = CustomCrypter16::new();
 
-        // Prepara una stringa da crittografare
+        // Prepare a string to encrypt
         let plaintext1 = oracle.prepare_string("testing 123;admin=true;blah");
 
-        // Cifra la stringa con CBC usando la chiave e l'IV, includendo il padding
+        // Encrypt the string with CBC using the key and IV, including padding
         let encrypted1 = plaintext1.ssl_cbc_encrypt(&key, &iv, Some(true)).unwrap();
 
-        // Decifra la stringa cifrata con CBC usando la chiave e l'IV
+        // Decrypt the encrypted string with CBC using the key and IV
         let decrypted1 = encrypted1.ssl_cbc_decrypt(&key, &iv, Some(true)).unwrap();
 
-        // Ottieni una stringa dalla sequenza di byte decifrata
+        // Get a string from the decrypted byte sequence
         let decrypted_string1 = String::from_utf8_lossy(&decrypted1);
 
-        // Rimuovi eventuali escape dal valore decifrato
+        // Remove any escapes from the decrypted value
         let unquoted_decrypted_value1 = oracle.unquote_str(&decrypted_string1);
 
-        // Verifica se il valore decifrato contiene ";admin=true;"
+        // Verify if the decrypted value contains ";admin=true;"
         let check_contains_admin = unquoted_decrypted_value1.find(";admin=true;").is_some();
         assert_eq!(check_contains_admin, true);
 
-        // Prepara una seconda stringa con l'input "\x00admin\x00true"
+        // Prepare a second string with the input "\x00admin\x00true"
         let plaintext2 = oracle.prepare_string("\x00admin\x00true");
 
-        // Cifra la seconda stringa con CBC usando la chiave e l'IV, includendo il padding
+        // Encrypt the second string with CBC using the key and IV, including padding
         let mut encrypted2 = plaintext2.ssl_cbc_encrypt(&key, &iv, Some(true)).unwrap();
 
-        // Modifica manualmente alcuni byte del ciphertext per cercare di ottenere ";admin=true;"
-        encrypted2[16] ^= 59; // ASCII del carattere ";"
-        encrypted2[22] ^= 61; // ASCII del carattere "="
+        // Modify some bytes of the ciphertext to try to obtain ";admin=true;"
+        encrypted2[16] ^= 59; // ASCII of character ";"
+        encrypted2[22] ^= 61; // ASCII of character "="
 
-        // Decifra il ciphertext modificato con CBC usando la chiave e l'IV
+        // Decrypt the modified ciphertext with CBC using the key and IV
         let decrypted2 = encrypted2.ssl_cbc_decrypt(&key, &iv, Some(true)).unwrap();
 
-        // Ottieni una stringa dalla sequenza di byte decifrata
+        // Get a string from the decrypted byte sequence
         let decrypted_string2 = String::from_utf8_lossy(&decrypted2);
 
-        // Rimuovi eventuali escape dal valore decifrato
+        // Remove any escapes from the decrypted value
         let unquoted_decrypted_value2 = oracle.unquote_str(&decrypted_string2);
 
-        // Verifica se il valore decifrato contiene ";admin=true;"
+        // Verify if the decrypted value contains ";admin=true;"
         let check_contains_admin = unquoted_decrypted_value2.find(";admin=true;").is_some();
         assert_eq!(check_contains_admin, true);
     }
 
     #[test]
     pub fn set_3_challenge_17() {
-        // Crea un oggetto CustomCrypter17
+        // Create an instance of CustomCrypter17
         let crypter = CustomCrypter17::new().unwrap();
 
-        // Dimensione di un blocco
+        // Block size
         const BLOCK_SIZE: usize = 16;
 
-        // Inizializza la chiave e l'IV con valori random di 16 bytes
+        // Initialize the key and IV with random 16-byte values
         let key = BLOCK_SIZE.random_block();
         let iv = BLOCK_SIZE.random_block();
 
-        // Ottiene il valore da decifrare dalla posizione 8 dei token ottenuti da CustomCrypter17
+        // Get the value to decrypt from position 8 of the tokens obtained from CustomCrypter17
         let clear_value = Base64::from_string(crypter.get_all_tokens().get(8).unwrap().to_string());
         let clear_bytes = clear_value.to_bytes().unwrap();
 
-        // Esegue la cifratura CBC dei byte con la chiave e l'IV forniti
+        // Perform CBC encryption of the bytes with the provided key and IV
         let encrypted_value = clear_bytes.to_vec().ssl_cbc_encrypt(&key, &iv, Some(false));
 
         match encrypted_value {
             Ok(ciphertext) => {
-                // Inizializza il vettore cleartext_encrypted per contenere il testo in chiaro cryptato
+                // Initialize the cleartext_encrypted vector to hold the encrypted plaintext
                 let mut cleartext_encrypted = vec![0; ciphertext.len()];
                 let mut prev = iv.clone();
 
-                // Divide il testo cifrato in blocchi
+                // Divide the ciphertext into blocks
                 let chunks = ciphertext.chunks(BLOCK_SIZE);
 
-                // Itera su ogni blocco cifrato
+                // Iterate over each encrypted block
                 for (block_index, block) in chunks.enumerate() {
                     let block_offset = block_index * BLOCK_SIZE;
 
-                    // Itera all'indietro all'interno del blocco
+                    // Iterate backwards within the block
                     for i in (0..BLOCK_SIZE).rev() {
                         let padding = (BLOCK_SIZE - i) as u8;
                         let t = [(padding - 1) ^ padding];
                         let xor_res = prev[i + 1..].to_vec().xor_single(t[0]);
                         prev[i + 1..].copy_from_slice(&xor_res);
 
-                        // Prova tutti i possibili valori per l'ultimo byte del blocco precedente
+                        // Try all possible values for the last byte of the previous block
                         for u in 0u8..=255 {
                             prev[i] ^= u;
                             let value_decrypted =
                                 block.to_vec().ssl_cbc_decrypt(&key, &prev, Some(true));
 
-                            // Verifica se il valore è stato decifrato correttamente
+                            // Verify if the value has been decrypted correctly
                             if value_decrypted.is_ok()
                                 && (i < BLOCK_SIZE - 1 || {
                                     prev[i - 1] ^= 1;
@@ -549,7 +548,7 @@ mod tests {
                                     result.is_ok()
                                 })
                             {
-                                // Calcola il nuovo byte del testo in chiaro
+                                // Calculate the new plaintext byte
                                 let new_content = padding ^ u;
                                 cleartext_encrypted[block_offset + i] = new_content;
 
@@ -561,14 +560,14 @@ mod tests {
                     prev = block.to_vec();
                 }
 
-                // Rimuove il padding dai byte decifrati
+                // Remove padding from decrypted bytes
                 let _ = cleartext_encrypted.unpad(16);
 
-                // Decifra i byte originali e quelli ottenuti dopo il processo
+                // Decrypt the original bytes and those obtained after the process
                 let decrypted_first = clear_bytes.ssl_cbc_decrypt(&key, &iv, Some(false));
                 let decrypted_second = cleartext_encrypted.ssl_cbc_decrypt(&key, &iv, Some(false));
 
-                // Verifica che i due testi decifrati siano uguali
+                // Verify that the two decrypted texts are equal
                 assert_eq!(decrypted_first.unwrap(), decrypted_second.unwrap());
             }
             Err(_) => {}
@@ -577,18 +576,22 @@ mod tests {
 
     #[test]
     pub fn set_3_challenge_18() {
+        // Base64-encoded ciphertext to decrypt (AES-CTR mode, key: "YELLOW SUBMARINE")
         let ciphertext = Base64::from_string(String::from(
             "L77na/nrFsKvynd6HzOoG7GHTLXsTVu9qvY/2syLXzhPweyyMTJULu/6/kXX0KSvoOLSFQ==",
         ));
 
+        // Decode the Base64 ciphertext to bytes, then decrypt using AES-CTR with the given key
         let cleartext = ciphertext
             .to_bytes()
             .unwrap()
             .ssl_ctr_decrypt(b"YELLOW SUBMARINE", Some(true))
             .unwrap();
 
+        // Convert the decrypted bytes to a UTF-8 string
         let result = String::from_utf8_lossy(&cleartext);
 
+        // Assert that the decrypted string matches the expected plaintext
         assert_eq!(
             result,
             "Yo, VIP Let's kick it Ice, Ice, baby Ice, Ice, baby "
@@ -597,24 +600,24 @@ mod tests {
 
     #[test]
     pub fn set_3_challenge_19() {
-        // Dimensione di un blocco
+        // Block size
         const BLOCK_SIZE: usize = 16;
 
-        // Genera una chiave random
+        // Generate a random key
         let key = BLOCK_SIZE.random_block();
 
-        //Legge il file data_19
+        // Read the file data_19
         let file_path = "./data/data_19.txt";
-        let file = File::open(file_path).expect("Impossibile leggere il file");
+        let file = File::open(file_path).expect("Unable to read the file");
         let buf_reader = BufReader::new(file);
 
         let mut results: Vec<Vec<u8>> = Vec::new();
 
-        // Legge il file linea per linea
+        // Read the file line by line
         for line in buf_reader.lines() {
-            // Se la lettura della linea è avvenuta senza errori
+            // If reading the line was successful
             if line.is_ok() {
-                // Ottiene il contenuto della linea
+                // Get the content of the line
                 let unwrapped_line = line.unwrap();
                 let line_bytes = Base64::from_string(unwrapped_line);
 
@@ -631,31 +634,31 @@ mod tests {
 
     #[test]
     pub fn set_3_challenge_20() {
-        // Dimensione di un blocco
+        // Block size
         const BLOCK_SIZE: usize = 16;
 
-        // Genera una chiave random
+        // Generate a random key
         let key = BLOCK_SIZE.random_block();
 
-        // Legge il file data_19
+        // Read the file data_19
         let file_path = "./data/data_20.txt";
-        let file = File::open(file_path).expect("Impossibile leggere il file");
+        let file = File::open(file_path).expect("Unable to read the file");
         let buf_reader = BufReader::new(file);
 
         let mut results: Vec<Vec<u8>> = Vec::new();
 
-        // Legge il file linea per linea
+        // Read the file line by line
         for line in buf_reader.lines() {
-            // Se la lettura della linea è avvenuta senza errori
+            // If reading the line was successful
             if line.is_ok() {
-                // Ottiene il contenuto della linea
+                // Get the content of the line
                 let unwrapped_line = line.unwrap();
 
-                // Converte la stringa Base64 in bytes
+                // Convert the Base64 string to bytes
                 let line_bytes = Base64::from_string(unwrapped_line);
 
                 if let Ok(bytes) = line_bytes.to_bytes() {
-                    // Cripta i bytes usando AES-CTR con nonce zero
+                    // Encrypt the bytes using AES-CTR with zero nonce
                     if let Ok(encrypt_result) = bytes.nonce_ctr_encrypt(&key, vec![0; 8]) {
                         results.push(encrypt_result);
                     }
@@ -663,15 +666,15 @@ mod tests {
             }
         }
 
-        // Ottiene la lunghezza minima dei risultati crittografici
+        // Get the minimum length of the ciphertext results
         let min = results.iter().map(|c| c.len()).min().unwrap();
 
-        // Tronca tutti i risultati alla lunghezza minima
+        // Truncate all results to the minimum length
         for ciphertext in &mut results {
             ciphertext.truncate(min);
         }
 
-        // Transpone i risultati crittografici per eseguire un attacco XOR ripetuto
+        // Transpose the ciphertext results for a repeated XOR attack
         let mut transposed: Vec<Vec<u8>> = vec![vec![]; min];
         for string in &results {
             for i in 0..string.len() {
@@ -680,29 +683,29 @@ mod tests {
             }
         }
 
-        // Inizializza un vettore per la chiave di decifrazione.
+        // Initialize a vector for the decryption key.
         let mut k_vec: Vec<u8> = Vec::new();
 
-        // Esegui l'attacco XOR ripetuto sui blocchi di dati.
+        // Perform the repeated XOR attack on the data blocks.
         for bl in transposed {
             match bl.evaluate_frequency() {
-                // Se la valutazione della frequenza restituisce una chiave possibile
+                // If frequency analysis returns a possible key
                 Some((_, key, _)) => k_vec.push(key),
-                // Altrimenti, continua con il prossimo blocco
+                // Otherwise, continue with the next block
                 None => {}
             }
         }
 
-        // Combina tutti i risultati crittografici in un singolo vettore
+        // Combine all ciphertext results into a single vector
         let flat_result: Vec<u8> = results.into_iter().flat_map(|f| f).collect();
 
-        // Applica l'operazione XOR con la chiave di decifrazione trovata
+        // Apply the XOR operation with the found decryption key
         let res = flat_result.repeating_key_xor(&k_vec);
 
-        // Converte i risultati decifrati in una stringa UTF-8
+        // Convert the decrypted results into a UTF-8 string
         let res_plain = String::from_utf8(res).unwrap();
 
-        // Verifica che la stringa decifrata contenga la sottostringa desiderata
+        // Verify that the decrypted string contains the desired substring
         assert!(res_plain.contains("I'm rated"));
     }
 }
