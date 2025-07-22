@@ -1,0 +1,15 @@
+[package]
+name = "jlm_crypto_lib"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+hex = "0.4"
+base64 = "0.13"
+aes = "0.8.3"
+openssl = "0.10.55"
+rand = "0.8.5"
+rust-crypto = { git = "https://github.com/max-b/rust-crypto", branch = "sha1-public" }
+byteorder = "1.2.3"

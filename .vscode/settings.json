@@ -1,0 +1,6 @@
+{
+    "rust-analyzer.linkedProjects": [
+        "./lab/Cargo.toml",
+        "./jlm_crypto_lib/Cargo.toml"
+    ]
+}
