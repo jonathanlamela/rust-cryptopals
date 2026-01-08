@@ -649,7 +649,7 @@ impl Hex {
     // Constructor to create a new `Hex` object from a hexadecimal string.
     pub fn new(s: String) -> Result<Hex, JlmCryptoErrors> {
         // Decodes the hexadecimal string into bytes.
-        match hex::decode(s.clone()) {
+        match hex::decode(s.as_bytes()) {
             // If decoding is successful, return a `Hex` object containing the string.
             Ok(_) => Ok(Hex(s)),
             // If there is an error during decoding, return a `JlmCryptoErrors` error.
