@@ -649,12 +649,18 @@ impl Hex {
     // Constructor to create a new `Hex` object from a hexadecimal string.
     pub fn new(s: String) -> Result<Hex, JlmCryptoErrors> {
         // Decodes the hexadecimal string into bytes.
-        match hex::decode(s.as_bytes()) {
-            // If decoding is successful, return a `Hex` object containing the string.
-            Ok(_) => Ok(Hex(s)),
-            // If there is an error during decoding, return a `JlmCryptoErrors` error.
-            Err(_) => Err(JlmCryptoErrors::InvalidHEXValue),
+        // Validate that the string contains only valid hexadecimal characters
+        if !s.chars().all(|c| c.is_ascii_hexdigit()) {
+            return Err(JlmCryptoErrors::InvalidHEXValue);
         }
+
+        // Check if the string has an even number of characters
+        if s.len() % 2 != 0 {
+            return Err(JlmCryptoErrors::InvalidHEXValue);
+        }
+
+        // If validation passes, return a Hex object
+        Ok(Hex(s))
     }
 
     // Constructor to create a `Hex` object from a string.
@@ -671,13 +677,12 @@ impl Hex {
 
     // Constructor to create a `Hex` object from a byte vector.
     pub fn from_bytes(s: Vec<u8>) -> Result<Hex, JlmCryptoErrors> {
-        // Encodes the bytes into hexadecimal format and attempts to parse the result as a `Hex` object.
-        match hex::encode(s).parse::<Hex>() {
-            // If parsing is successful, return the created `Hex` object.
-            Ok(hex_value) => Ok(hex_value),
-            // If there is an error during parsing, return a `JlmCryptoErrors` error.
-            Err(_) => Err(JlmCryptoErrors::InvalidBytesToHEX),
-        }
+        // Encodes the bytes into hexadecimal format without using external libraries
+        let hex_string = s
+            .iter()
+            .map(|byte| format!("{:02x}", byte))
+            .collect::<String>();
+        Ok(Hex(hex_string))
     }
 
     // Method that returns the length of the hexadecimal sequence.
@@ -688,12 +693,20 @@ impl Hex {
     // Method that converts the `Hex` object into a byte vector.
     pub fn to_bytes(&self) -> Result<Vec<u8>, JlmCryptoErrors> {
         // Decodes the hexadecimal string into bytes.
-        match hex::decode(&self.0) {
-            // If decoding is successful, return the obtained bytes.
-            Ok(v) => Ok(v),
-            // If there is an error during decoding, return a `JlmCryptoErrors` error.
-            Err(_) => Err(JlmCryptoErrors::InvalidHEXToBytesConversion),
+        let mut result = Vec::new();
+
+        // Iterate over the hexadecimal string in pairs of characters.
+        for i in (0..self.0.len()).step_by(2) {
+            // Extract a pair of hexadecimal characters.
+            let byte_str = &self.0[i..i + 2];
+
+            // Convert the hexadecimal pair to a byte and add it to the result vector.
+            match u8::from_str_radix(byte_str, 16) {
+                Ok(byte) => result.push(byte),
+                Err(_) => return Err(JlmCryptoErrors::InvalidHEXToBytesConversion),
+            }
         }
+        Ok(result)
     }
 
     // Method that converts the `Hex` object into a `Base64` object.
