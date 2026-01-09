@@ -713,8 +713,34 @@ impl Hex {
     pub fn to_b64(&self) -> Result<Base64, JlmCryptoErrors> {
         // Converts the `Hex` object into a byte vector and then into a `Base64` object.
         match &self.to_bytes() {
-            Ok(v) => Ok(Base64::from_string(base64::encode(v))),
-            // If there is an error during conversion, return a `JlmCryptoErrors` error.
+            Ok(v) => {
+                const BASE64_CHARS: &[u8] =
+                    b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+                let mut result = String::new();
+
+                for chunk in v.chunks(3) {
+                    let b1 = chunk[0];
+                    let b2 = if chunk.len() > 1 { chunk[1] } else { 0 };
+                    let b3 = if chunk.len() > 2 { chunk[2] } else { 0 };
+
+                    let n = ((b1 as u32) << 16) | ((b2 as u32) << 8) | (b3 as u32);
+
+                    result.push(BASE64_CHARS[((n >> 18) & 63) as usize] as char);
+                    result.push(BASE64_CHARS[((n >> 12) & 63) as usize] as char);
+                    if chunk.len() > 1 {
+                        result.push(BASE64_CHARS[((n >> 6) & 63) as usize] as char);
+                    } else {
+                        result.push('=');
+                    }
+                    if chunk.len() > 2 {
+                        result.push(BASE64_CHARS[(n & 63) as usize] as char);
+                    } else {
+                        result.push('=');
+                    }
+                }
+
+                Ok(Base64::from_string(result))
+            }
             Err(_) => Err(JlmCryptoErrors::InvalidHEXToBase64Conversion),
         }
     }
@@ -745,18 +771,63 @@ impl Base64 {
 
     // Method that creates a `Base64` object from a byte vector.
     pub fn from_bytes(s: &[u8]) -> Base64 {
-        Base64(base64::encode(s))
+        const BASE64_CHARS: &[u8] =
+            b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let mut result = String::new();
+
+        for chunk in s.chunks(3) {
+            let b1 = chunk[0];
+            let b2 = if chunk.len() > 1 { chunk[1] } else { 0 };
+            let b3 = if chunk.len() > 2 { chunk[2] } else { 0 };
+
+            let n = ((b1 as u32) << 16) | ((b2 as u32) << 8) | (b3 as u32);
+
+            result.push(BASE64_CHARS[((n >> 18) & 63) as usize] as char);
+            result.push(BASE64_CHARS[((n >> 12) & 63) as usize] as char);
+            if chunk.len() > 1 {
+                result.push(BASE64_CHARS[((n >> 6) & 63) as usize] as char);
+            } else {
+                result.push('=');
+            }
+            if chunk.len() > 2 {
+                result.push(BASE64_CHARS[(n & 63) as usize] as char);
+            } else {
+                result.push('=');
+            }
+        }
+
+        Base64(result)
     }
 
     // Method that converts the `Base64` object into a byte vector.
     pub fn to_bytes(&self) -> Result<Vec<u8>, JlmCryptoErrors> {
         // Decodes the Base64 string into bytes.
-        match base64::decode(&self.0) {
-            // If decoding is successful, return the obtained bytes.
-            Ok(r) => Ok(r),
-            // If there is an error during decoding, return a `JlmCryptoErrors` error.
-            Err(_) => Err(JlmCryptoErrors::InvalidBase64ToBytes),
+        const BASE64_CHARS: &str =
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let mut result = Vec::new();
+        let mut buffer = 0u32;
+        let mut bits = 0;
+
+        for c in self.0.chars() {
+            if c == '=' {
+                break;
+            }
+
+            if let Some(index) = BASE64_CHARS.find(c) {
+                buffer = (buffer << 6) | (index as u32);
+                bits += 6;
+
+                if bits >= 8 {
+                    bits -= 8;
+                    result.push((buffer >> bits) as u8);
+                    buffer &= (1 << bits) - 1;
+                }
+            } else if !c.is_whitespace() {
+                return Err(JlmCryptoErrors::InvalidBase64ToBytes);
+            }
         }
+
+        Ok(result)
     }
 }
 
