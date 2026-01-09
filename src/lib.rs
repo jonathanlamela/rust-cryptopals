@@ -7,4 +7,6 @@ pub mod oracle;
 pub mod usizecrypt;
 
 #[cfg(test)]
-mod tests;
+mod set1;
+mod set2;
+mod set3;

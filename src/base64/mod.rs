@@ -1,22 +1,47 @@
 use std::fmt;
 
+mod tests;
+
 use crate::errors::JlmCryptoErrors;
 
 pub struct Base64(pub String);
 
-// Definition of the `Base64` structure.
+/// Implementation of methods for the `Base64` structure.
+/// These methods include constructors and conversion functions.
+/// The `Base64` structure represents a Base64-encoded string.
+/// The methods allow creating `Base64` objects from strings or byte arrays,
+/// and converting `Base64` objects back to byte arrays.
+/// The implementation also includes error handling for invalid Base64 strings.
 impl Base64 {
-    // Constructor to create a new `Base64` object from a string.
-    pub fn new(s: String) -> Base64 {
-        Base64(s)
-    }
-
-    // Method that creates a `Base64` object from a string.
+    /// Method that creates a `Base64` object from a string.
+    /// # Arguments
+    /// * `s` - A string that holds the Base64-encoded data.
+    /// # Returns
+    /// * A `Base64` object containing the provided string.
+    /// # Example
+    /// ```rust
+    /// use rust_cryptopals::base64::Base64;
+    /// let base64 = Base64::from_string(String::from("SGVsbG8gd29ybGQ="));
+    /// ```
+    /// # Errors
+    /// This function does not return errors.
     pub fn from_string(s: String) -> Base64 {
         Base64(s)
     }
 
-    // Method that creates a `Base64` object from a byte vector.
+    /// Method that creates a `Base64` object from a byte vector.
+    /// # Arguments
+    /// * `s` - A byte slice that holds the data to be encoded in Base64.
+    /// # Returns
+    /// * A `Base64` object containing the Base64-encoded representation of the bytes.
+    /// # Example
+    /// ```rust
+    /// use rust_cryptopals::base64::Base64;
+    /// let bytes = vec![72, 101, 108, 108, 111];
+    /// let base64 = Base64::from_bytes(&bytes);
+    /// ```
+    /// # Errors
+    /// This function does not return errors.
     pub fn from_bytes(s: &[u8]) -> Base64 {
         const BASE64_CHARS: &[u8] =
             b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

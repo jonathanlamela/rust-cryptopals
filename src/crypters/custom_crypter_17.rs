@@ -49,7 +49,7 @@ impl CustomCrypter17 {
     }
 
     pub fn get_picked_token(&self) -> Base64 {
-        Base64::new(self.picked_token.clone())
+        Base64::from_string(self.picked_token.clone())
     }
 
     pub fn get_all_tokens(&self) -> [&str; 10] {
