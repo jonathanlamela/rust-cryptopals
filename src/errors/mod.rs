@@ -20,10 +20,3 @@ pub enum JlmCryptoErrors {
     BadEncryptionMode,
     FailedAesCtrEncrypt,
 }
-
-#[derive(Copy, Clone, Eq, PartialEq)]
-pub enum MODE {
-    ECB,
-    CBC,
-    CTR,
-}
