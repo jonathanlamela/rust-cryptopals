@@ -2,7 +2,7 @@ use byteorder::{LittleEndian, WriteBytesExt};
 use crypto::{aessafe, symmetriccipher::BlockEncryptor};
 use openssl::symm::{Cipher, Crypter, Mode};
 
-use crate::{errors::JlmCryptoErrors, types::SingleXorRow};
+use crate::errors::JlmCryptoErrors;
 
 pub const LETTER_FREQUENCIES: [f64; 26] = [
     8.34, 1.54, 2.73, 4.14, 12.60, 2.03, 1.92, 6.11, 6.71, 0.23, 0.87, 4.24, 2.53, 6.80, 7.70,
@@ -276,24 +276,20 @@ impl CryptoVec for Vec<u8> {
 
     fn evaluate_frequency(&self) -> Option<(f64, u8, Vec<u8>)> {
         // Create a vector to store the results of single XORs
-        let mut xors_vector: Vec<SingleXorRow> = Vec::new();
+        let mut xors_vector: Vec<(u8, Vec<u8>)> = Vec::new();
 
         // Iterate over all possible key values (from 0 to 255)
         for key in 0..=255 {
             // Calculate the single XOR result for the current key
-            let item = SingleXorRow {
-                key,
-                xor_value: self.xor_single(key),
-            };
             // Add the single XOR result to the vector
-            xors_vector.push(item);
+            xors_vector.push((key, self.xor_single(key)));
         }
 
         // Filter the results with positive scores
         let filtered_map = xors_vector.iter().filter_map(|row| {
-            row.xor_value
+            row.1
                 .evaluate_score()
-                .map(|score| (score, row.key, row.xor_value.clone()))
+                .map(|score| (score, row.0, row.1.clone()))
         });
 
         // Extract the XOR value with the highest score
