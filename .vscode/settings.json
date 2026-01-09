@@ -1,8 +1,4 @@
 {
-  "rust-analyzer.linkedProjects": [
-    "./lab/Cargo.toml",
-    "./jlm_crypto_lib/Cargo.toml"
-  ],
-  "rust-analyzer.testExplorer": true,
-  "rustTestExplorer.rootCargoManifestFilePath": "./jlm_crypto_lib/Cargo.toml"
+  "rust-analyzer.linkedProjects": ["Cargo.toml"],
+  "rust-analyzer.testExplorer": true
 }
