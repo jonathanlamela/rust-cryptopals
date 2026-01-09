@@ -1,3 +1,5 @@
+pub mod base;
+
 use crate::errors::JlmCryptoErrors;
 
 pub trait Oracle {
