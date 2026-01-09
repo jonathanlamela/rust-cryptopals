@@ -2,12 +2,14 @@ use std::{fmt, str::FromStr};
 
 use crate::{base64::Base64, errors::JlmCryptoErrors};
 
+/// Structure representing a hexadecimal sequence.
 pub struct Hex(pub String);
 
-// Define a structure `Hex` to represent hexadecimal values.
+/// Implementation of methods for the `Hex` structure.
 impl Hex {
-    // Constructor to create a new `Hex` object from a hexadecimal string.
-    pub fn new(s: String) -> Result<Hex, JlmCryptoErrors> {
+    /// Constructor to create a `Hex` object from a hexadecimal string with validation.
+    /// Returns an error if the string is not a valid hexadecimal representation.
+    pub fn from_string(s: String) -> Result<Hex, JlmCryptoErrors> {
         // Decodes the hexadecimal string into bytes.
         // Validate that the string contains only valid hexadecimal characters
         if !s.chars().all(|c| c.is_ascii_hexdigit()) {
@@ -23,19 +25,15 @@ impl Hex {
         Ok(Hex(s))
     }
 
-    // Constructor to create a `Hex` object from a string.
-    pub fn from_string(s: String) -> Result<Hex, JlmCryptoErrors> {
-        // Calls the `new` constructor to create a `Hex` object from the provided string.
-        Hex::new(s.to_string())
-    }
-
-    // Constructor to create a `Hex` object directly from a hexadecimal string.
+    /// Constructor to create a `Hex` object from a hexadecimal string without validation.
+    /// Returns an error if the string is not a valid hexadecimal representation.
     pub fn from_hex_string(s: String) -> Result<Hex, JlmCryptoErrors> {
         // Creates a `Hex` object containing the provided hexadecimal string.
         Ok(Hex(s))
     }
 
-    // Constructor to create a `Hex` object from a byte vector.
+    /// Constructor to create a `Hex` object from a byte vector.
+    /// Returns an error if the conversion fails.
     pub fn from_bytes(s: Vec<u8>) -> Result<Hex, JlmCryptoErrors> {
         // Encodes the bytes into hexadecimal format without using external libraries
         let hex_string = s
@@ -45,12 +43,13 @@ impl Hex {
         Ok(Hex(hex_string))
     }
 
-    // Method that returns the length of the hexadecimal sequence.
+    /// Method that returns the length of the hexadecimal string.
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
-    // Method that converts the `Hex` object into a byte vector.
+    /// Method that converts the `Hex` object into a byte vector.
+    /// Returns an error if the conversion fails.
     pub fn to_bytes(&self) -> Result<Vec<u8>, JlmCryptoErrors> {
         // Decodes the hexadecimal string into bytes.
         let mut result = Vec::new();
@@ -69,8 +68,8 @@ impl Hex {
         Ok(result)
     }
 
-    // Method that converts the `Hex` object into a `Base64` object.
-    pub fn to_b64(&self) -> Result<Base64, JlmCryptoErrors> {
+    /// Method that converts the `Hex` object into a `Base64` object.
+    pub fn to_base64(&self) -> Result<Base64, JlmCryptoErrors> {
         // Converts the `Hex` object into a byte vector and then into a `Base64` object.
         match &self.to_bytes() {
             Ok(v) => {
@@ -106,7 +105,7 @@ impl Hex {
     }
 }
 
-// Implementation of the `FromStr` trait for the `Hex` structure.
+/// Implementation of the `FromStr` trait for the `Hex` structure.
 impl FromStr for Hex {
     type Err = JlmCryptoErrors;
 
@@ -117,7 +116,7 @@ impl FromStr for Hex {
     }
 }
 
-// Implementation of the `PartialEq` trait for the `Hex` structure.
+/// Implementation of the `PartialEq` trait for the `Hex` structure.
 impl PartialEq for Hex {
     // Method that compares two `Hex` objects for equality.
     fn eq(&self, other: &Self) -> bool {
@@ -125,7 +124,7 @@ impl PartialEq for Hex {
     }
 }
 
-// Implementation of the `Display` trait for the `Hex` structure.
+/// Implementation of the `Display` trait for the `Hex` structure.
 impl<'a> fmt::Display for Hex {
     // Method that formats the `Hex` object for display.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -133,7 +132,7 @@ impl<'a> fmt::Display for Hex {
     }
 }
 
-// Implementation of the `Debug` trait for the `Hex` structure.
+/// Implementation of the `Debug` trait for the `Hex` structure.
 impl<'a> fmt::Debug for Hex {
     // Method that formats the `Hex` object for display in debug mode.
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

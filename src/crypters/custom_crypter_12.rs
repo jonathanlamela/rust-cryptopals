@@ -20,7 +20,7 @@ impl CustomCrypter12 {
         let key = Self::BLOCK_SIZE.random_block().to_vec();
 
         //Create an instance of the Base64 class from a string
-        let base64_suffix = Base64::new(String::from("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"));
+        let base64_suffix = Base64::from_string(String::from("Um9sbGluJyBpbiBteSA1LjAKV2l0aCBteSByYWctdG9wIGRvd24gc28gbXkgaGFpciBjYW4gYmxvdwpUaGUgZ2lybGllcyBvbiBzdGFuZGJ5IHdhdmluZyBqdXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUgYnkK"));
         let suffix: Vec<u8> = base64_suffix
             .to_bytes()
             .unwrap_or_else(|_| panic!("Invalid hex to bytes conversion"));
