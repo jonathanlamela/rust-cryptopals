@@ -1,21 +1,15 @@
 title: Rust Cryptopals
 description: Soluzioni alle Cryptopals Crypto Challenges in Rust — documentazione bilingue IT/EN
 remote_theme: just-the-docs/just-the-docs@v0.10.0
-
 plugins:
   - jekyll-remote-theme
 url: "https://jonathanlamela.github.io"
 baseurl: "/rust-cryptopals"
-lang: it
-
-# Just the Docs settings
 search_enabled: true
 heading_anchors: true
 color_scheme: light
 nav_sort: case_sensitive
-
 aux_links:
   "GitHub":
-    - "//github.com/yourusername/rust-cryptopals"
-
+    - "//github.com/jonathanlamela/rust-cryptopals"
 footer_content: "Rust Cryptopals Docs · Just the Docs theme"
