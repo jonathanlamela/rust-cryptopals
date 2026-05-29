@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 7 — AES in ECB mode
 
-[← Previous](../challenge_06/) · [Next →](../challenge_08/) · [🇮🇹 Italiano](../../it/challenge_07/) · [Set 1 index](../)
+[← Previous](../challenge_06/) · [Next →](../challenge_08/) · [🇮🇹 Italiano](../../it/challenge_07/) · [Set 1 index](../../)
 
 ---
 

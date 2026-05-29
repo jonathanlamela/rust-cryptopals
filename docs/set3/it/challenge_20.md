@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 20 — Rompi CTR con nonce fisso (sostituzione)
 
-[← Sfida precedente](../challenge_19/) · [🇬🇧 English](../../en/challenge_20/) · [Indice Set 3](../)
+[← Sfida precedente](../challenge_19/) · [🇬🇧 English](../../en/challenge_20/) · [Indice Set 3](../../)
 
 ---
 

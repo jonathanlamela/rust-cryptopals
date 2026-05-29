@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 3 — Cifrario XOR a carattere singolo
 
-[← Sfida precedente](../challenge_02/) · [Sfida successiva →](../challenge_04/) · [🇬🇧 English](../../en/challenge_03/) · [Indice Set 1](../)
+[← Sfida precedente](../challenge_02/) · [Sfida successiva →](../challenge_04/) · [🇬🇧 English](../../en/challenge_03/) · [Indice Set 1](../../)
 
 ---
 

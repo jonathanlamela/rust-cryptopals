@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 16 — CBC bitflipping attacks
 
-[← Sfida precedente](../challenge_15/) · [🇬🇧 English](../../en/challenge_16/) · [Indice Set 2](../)
+[← Sfida precedente](../challenge_15/) · [🇬🇧 English](../../en/challenge_16/) · [Indice Set 2](../../)
 
 ---
 

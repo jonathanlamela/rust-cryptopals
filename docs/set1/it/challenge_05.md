@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 5 — Implementa XOR a chiave ripetuta
 
-[← Sfida precedente](../challenge_04/) · [Sfida successiva →](../challenge_06/) · [🇬🇧 English](../../en/challenge_05/) · [Indice Set 1](../)
+[← Sfida precedente](../challenge_04/) · [Sfida successiva →](../challenge_06/) · [🇬🇧 English](../../en/challenge_05/) · [Indice Set 1](../../)
 
 ---
 

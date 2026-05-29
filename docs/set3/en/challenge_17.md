@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 17 — The CBC padding oracle
 
-[Next →](../challenge_18/) · [🇮🇹 Italiano](../../it/challenge_17/) · [Set 3 index](../)
+[Next →](../challenge_18/) · [🇮🇹 Italiano](../../it/challenge_17/) · [Set 3 index](../../)
 
 ---
 

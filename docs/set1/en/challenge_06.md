@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 6 — Break repeating-key XOR
 
-[← Previous](../challenge_05/) · [Next →](../challenge_07/) · [🇮🇹 Italiano](../../it/challenge_06/) · [Set 1 index](../)
+[← Previous](../challenge_05/) · [Next →](../challenge_07/) · [🇮🇹 Italiano](../../it/challenge_06/) · [Set 1 index](../../)
 
 ---
 

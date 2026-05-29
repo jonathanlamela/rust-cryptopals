@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 19 — Rompi CTR con nonce fisso (statisticamente)
 
-[← Sfida precedente](../challenge_18/) · [Sfida successiva →](../challenge_20/) · [🇬🇧 English](../../en/challenge_19/) · [Indice Set 3](../)
+[← Sfida precedente](../challenge_18/) · [Sfida successiva →](../challenge_20/) · [🇬🇧 English](../../en/challenge_19/) · [Indice Set 3](../../)
 
 ---
 

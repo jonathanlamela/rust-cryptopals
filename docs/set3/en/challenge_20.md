@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 20 — Break fixed-nonce CTR using substitutions
 
-[← Previous](../challenge_19/) · [🇮🇹 Italiano](../../it/challenge_20/) · [Set 3 index](../)
+[← Previous](../challenge_19/) · [🇮🇹 Italiano](../../it/challenge_20/) · [Set 3 index](../../)
 
 ---
 

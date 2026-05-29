@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 9 — Implementa padding PKCS#7
 
-[Sfida successiva →](../challenge_10/) · [🇬🇧 English](../../en/challenge_09/) · [Indice Set 2](../)
+[Sfida successiva →](../challenge_10/) · [🇬🇧 English](../../en/challenge_09/) · [Indice Set 2](../../)
 
 ---
 

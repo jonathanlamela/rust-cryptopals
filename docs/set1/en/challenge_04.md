@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 4 — Detect single-character XOR
 
-[← Previous](../challenge_03/) · [Next →](../challenge_05/) · [🇮🇹 Italiano](../../it/challenge_04/) · [Set 1 index](../)
+[← Previous](../challenge_03/) · [Next →](../challenge_05/) · [🇮🇹 Italiano](../../it/challenge_04/) · [Set 1 index](../../)
 
 ---
 

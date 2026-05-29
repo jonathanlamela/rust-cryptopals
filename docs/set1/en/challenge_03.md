@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 3 — Single-byte XOR cipher
 
-[← Previous](../challenge_02/) · [Next →](../challenge_04/) · [🇮🇹 Italiano](../../it/challenge_03/) · [Set 1 index](../)
+[← Previous](../challenge_02/) · [Next →](../challenge_04/) · [🇮🇹 Italiano](../../it/challenge_03/) · [Set 1 index](../../)
 
 ---
 

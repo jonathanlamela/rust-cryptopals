@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 8 — Detect AES in ECB mode
 
-[← Previous](../challenge_07/) · [🇮🇹 Italiano](../../it/challenge_08/) · [Set 1 index](../)
+[← Previous](../challenge_07/) · [🇮🇹 Italiano](../../it/challenge_08/) · [Set 1 index](../../)
 
 ---
 

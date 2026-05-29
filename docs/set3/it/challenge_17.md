@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 17 — The CBC padding oracle
 
-[Sfida successiva →](../challenge_18/) · [🇬🇧 English](../../en/challenge_17/) · [Indice Set 3](../)
+[Sfida successiva →](../challenge_18/) · [🇬🇧 English](../../en/challenge_17/) · [Indice Set 3](../../)
 
 ---
 

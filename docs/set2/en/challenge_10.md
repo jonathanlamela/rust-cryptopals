@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 10 — Implement CBC mode
 
-[← Previous](../challenge_09/) · [Next →](../challenge_11/) · [🇮🇹 Italiano](../../it/challenge_10/) · [Set 2 index](../)
+[← Previous](../challenge_09/) · [Next →](../challenge_11/) · [🇮🇹 Italiano](../../it/challenge_10/) · [Set 2 index](../../)
 
 ---
 

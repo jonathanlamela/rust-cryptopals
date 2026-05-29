@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 7 — Decifra AES in modalità ECB
 
-[← Sfida precedente](../challenge_06/) · [Sfida successiva →](../challenge_08/) · [🇬🇧 English](../../en/challenge_07/) · [Indice Set 1](../)
+[← Sfida precedente](../challenge_06/) · [Sfida successiva →](../challenge_08/) · [🇬🇧 English](../../en/challenge_07/) · [Indice Set 1](../../)
 
 ---
 

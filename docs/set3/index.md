@@ -12,7 +12,7 @@ Il terzo set porta gli attacchi a un livello superiore. La sfida 17 mostra come 
 
 | # | Titolo | Descrizione | IT | EN |
 |---|--------|-------------|----|----|
-| 17 | The CBC padding oracle | Decifratura completa via oracle di padding | [IT](/set3/it/challenge_17/) | [EN](/set3/en/challenge_17/) |
-| 18 | Implementa CTR mode | AES come cifrario a flusso con contatore | [IT](/set3/it/challenge_18/) | [EN](/set3/en/challenge_18/) |
-| 19 | Rompi CTR con nonce fisso (statistico) | Attacco frequenziale su keystream riutilizzato | [IT](/set3/it/challenge_19/) | [EN](/set3/en/challenge_19/) |
-| 20 | Rompi CTR con nonce fisso (sostituzione) | Attacco scalato su molti ciphertext a keystream comune | [IT](/set3/it/challenge_20/) | [EN](/set3/en/challenge_20/) |
+| 17 | The CBC padding oracle | Decifratura completa via oracle di padding | [IT](it/challenge_17/) | [EN](en/challenge_17/) |
+| 18 | Implementa CTR mode | AES come cifrario a flusso con contatore | [IT](it/challenge_18/) | [EN](en/challenge_18/) |
+| 19 | Rompi CTR con nonce fisso (statistico) | Attacco frequenziale su keystream riutilizzato | [IT](it/challenge_19/) | [EN](en/challenge_19/) |
+| 20 | Rompi CTR con nonce fisso (sostituzione) | Attacco scalato su molti ciphertext a keystream comune | [IT](it/challenge_20/) | [EN](en/challenge_20/) |

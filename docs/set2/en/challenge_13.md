@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 13 — ECB cut-and-paste
 
-[← Previous](../challenge_12/) · [Next →](../challenge_14/) · [🇮🇹 Italiano](../../it/challenge_13/) · [Set 2 index](../)
+[← Previous](../challenge_12/) · [Next →](../challenge_14/) · [🇮🇹 Italiano](../../it/challenge_13/) · [Set 2 index](../../)
 
 ---
 

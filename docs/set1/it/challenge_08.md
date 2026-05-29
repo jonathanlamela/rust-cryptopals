@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 8 — Rileva AES in modalità ECB
 
-[← Sfida precedente](../challenge_07/) · [🇬🇧 English](../../en/challenge_08/) · [Indice Set 1](../)
+[← Sfida precedente](../challenge_07/) · [🇬🇧 English](../../en/challenge_08/) · [Indice Set 1](../../)
 
 ---
 

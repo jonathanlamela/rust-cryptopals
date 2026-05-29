@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 1 — Converti hex in base64
 
-[Sfida successiva →](../challenge_02/) · [🇬🇧 English](../../en/challenge_01/) · [Indice Set 1](../)
+[Sfida successiva →](../challenge_02/) · [🇬🇧 English](../../en/challenge_01/) · [Indice Set 1](../../)
 
 ---
 

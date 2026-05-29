@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 13 — ECB cut-and-paste
 
-[← Sfida precedente](../challenge_12/) · [Sfida successiva →](../challenge_14/) · [🇬🇧 English](../../en/challenge_13/) · [Indice Set 2](../)
+[← Sfida precedente](../challenge_12/) · [Sfida successiva →](../challenge_14/) · [🇬🇧 English](../../en/challenge_13/) · [Indice Set 2](../../)
 
 ---
 

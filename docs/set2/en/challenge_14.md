@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 14 — Byte-at-a-time ECB decryption (harder)
 
-[← Previous](../challenge_13/) · [Next →](../challenge_15/) · [🇮🇹 Italiano](../../it/challenge_14/) · [Set 2 index](../)
+[← Previous](../challenge_13/) · [Next →](../challenge_15/) · [🇮🇹 Italiano](../../it/challenge_14/) · [Set 2 index](../../)
 
 ---
 

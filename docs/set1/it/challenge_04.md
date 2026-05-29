@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 4 — Rileva XOR a carattere singolo
 
-[← Sfida precedente](../challenge_03/) · [Sfida successiva →](../challenge_05/) · [🇬🇧 English](../../en/challenge_04/) · [Indice Set 1](../)
+[← Sfida precedente](../challenge_03/) · [Sfida successiva →](../challenge_05/) · [🇬🇧 English](../../en/challenge_04/) · [Indice Set 1](../../)
 
 ---
 

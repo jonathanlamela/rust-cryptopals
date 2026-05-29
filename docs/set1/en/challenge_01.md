@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 1 — Convert hex to base64
 
-[Next →](../challenge_02/) · [🇮🇹 Italiano](../../it/challenge_01/) · [Set 1 index](../)
+[Next →](../challenge_02/) · [🇮🇹 Italiano](../../it/challenge_01/) · [Set 1 index](../../)
 
 ---
 

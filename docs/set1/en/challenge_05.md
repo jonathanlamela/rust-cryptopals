@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 5 — Implement repeating-key XOR
 
-[← Previous](../challenge_04/) · [Next →](../challenge_06/) · [🇮🇹 Italiano](../../it/challenge_05/) · [Set 1 index](../)
+[← Previous](../challenge_04/) · [Next →](../challenge_06/) · [🇮🇹 Italiano](../../it/challenge_05/) · [Set 1 index](../../)
 
 ---
 

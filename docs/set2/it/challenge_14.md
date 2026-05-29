@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 14 — Byte-at-a-time ECB decryption (difficile)
 
-[← Sfida precedente](../challenge_13/) · [Sfida successiva →](../challenge_15/) · [🇬🇧 English](../../en/challenge_14/) · [Indice Set 2](../)
+[← Sfida precedente](../challenge_13/) · [Sfida successiva →](../challenge_15/) · [🇬🇧 English](../../en/challenge_14/) · [Indice Set 2](../../)
 
 ---
 

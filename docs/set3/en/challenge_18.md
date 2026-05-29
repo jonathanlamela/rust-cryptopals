@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 18 — Implement CTR mode
 
-[← Previous](../challenge_17/) · [Next →](../challenge_19/) · [🇮🇹 Italiano](../../it/challenge_18/) · [Set 3 index](../)
+[← Previous](../challenge_17/) · [Next →](../challenge_19/) · [🇮🇹 Italiano](../../it/challenge_18/) · [Set 3 index](../../)
 
 ---
 

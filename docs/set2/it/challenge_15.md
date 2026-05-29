@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 15 — Validazione padding PKCS#7
 
-[← Sfida precedente](../challenge_14/) · [Sfida successiva →](../challenge_16/) · [🇬🇧 English](../../en/challenge_15/) · [Indice Set 2](../)
+[← Sfida precedente](../challenge_14/) · [Sfida successiva →](../challenge_16/) · [🇬🇧 English](../../en/challenge_15/) · [Indice Set 2](../../)
 
 ---
 

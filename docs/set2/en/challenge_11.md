@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 11 — An ECB/CBC detection oracle
 
-[← Previous](../challenge_10/) · [Next →](../challenge_12/) · [🇮🇹 Italiano](../../it/challenge_11/) · [Set 2 index](../)
+[← Previous](../challenge_10/) · [Next →](../challenge_12/) · [🇮🇹 Italiano](../../it/challenge_11/) · [Set 2 index](../../)
 
 ---
 

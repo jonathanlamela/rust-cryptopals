@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 2 — Fixed XOR
 
-[← Previous](../challenge_01/) · [Next →](../challenge_03/) · [🇮🇹 Italiano](../../it/challenge_02/) · [Set 1 index](../)
+[← Previous](../challenge_01/) · [Next →](../challenge_03/) · [🇮🇹 Italiano](../../it/challenge_02/) · [Set 1 index](../../)
 
 ---
 

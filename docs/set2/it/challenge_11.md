@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 11 — Oracle ECB/CBC — rileva la modalità
 
-[← Sfida precedente](../challenge_10/) · [Sfida successiva →](../challenge_12/) · [🇬🇧 English](../../en/challenge_11/) · [Indice Set 2](../)
+[← Sfida precedente](../challenge_10/) · [Sfida successiva →](../challenge_12/) · [🇬🇧 English](../../en/challenge_11/) · [Indice Set 2](../../)
 
 ---
 

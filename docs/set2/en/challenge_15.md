@@ -9,7 +9,7 @@ lang: en
 
 # Challenge 15 — PKCS#7 padding validation
 
-[← Previous](../challenge_14/) · [Next →](../challenge_16/) · [🇮🇹 Italiano](../../it/challenge_15/) · [Set 2 index](../)
+[← Previous](../challenge_14/) · [Next →](../challenge_16/) · [🇮🇹 Italiano](../../it/challenge_15/) · [Set 2 index](../../)
 
 ---
 

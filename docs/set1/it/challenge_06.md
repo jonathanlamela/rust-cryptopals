@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 6 — Rompi XOR a chiave ripetuta
 
-[← Sfida precedente](../challenge_05/) · [Sfida successiva →](../challenge_07/) · [🇬🇧 English](../../en/challenge_06/) · [Indice Set 1](../)
+[← Sfida precedente](../challenge_05/) · [Sfida successiva →](../challenge_07/) · [🇬🇧 English](../../en/challenge_06/) · [Indice Set 1](../../)
 
 ---
 

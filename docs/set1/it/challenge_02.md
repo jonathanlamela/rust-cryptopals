@@ -9,7 +9,7 @@ lang: it
 
 # Sfida 2 — XOR fisso
 
-[← Sfida precedente](../challenge_01/) · [Sfida successiva →](../challenge_03/) · [🇬🇧 English](../../en/challenge_02/) · [Indice Set 1](../)
+[← Sfida precedente](../challenge_01/) · [Sfida successiva →](../challenge_03/) · [🇬🇧 English](../../en/challenge_02/) · [Indice Set 1](../../)
 
 ---
 

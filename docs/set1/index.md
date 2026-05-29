@@ -12,11 +12,11 @@ Il primo set di sfide Cryptopals introduce le basi della crittografia applicata:
 
 | # | Titolo | Descrizione | IT | EN |
 |---|--------|-------------|----|----|
-| 1 | Converti hex in base64 | Conversione tra formati di codifica binaria | [IT](/set1/it/challenge_01/) | [EN](/set1/en/challenge_01/) |
-| 2 | XOR fisso | XOR bit-a-bit tra due sequenze di byte | [IT](/set1/it/challenge_02/) | [EN](/set1/en/challenge_02/) |
-| 3 | Cifrario XOR a carattere singolo | Decifra XOR con un singolo byte di chiave | [IT](/set1/it/challenge_03/) | [EN](/set1/en/challenge_03/) |
-| 4 | Rileva XOR a carattere singolo | Trova la riga cifrata in un file | [IT](/set1/it/challenge_04/) | [EN](/set1/en/challenge_04/) |
-| 5 | Implementa XOR a chiave ripetuta | Cifrario Vigenère su byte | [IT](/set1/it/challenge_05/) | [EN](/set1/en/challenge_05/) |
-| 6 | Rompi XOR a chiave ripetuta | Attacco statistico con distanza di Hamming | [IT](/set1/it/challenge_06/) | [EN](/set1/en/challenge_06/) |
-| 7 | Decifra AES in modalità ECB | Primo contatto con AES-ECB | [IT](/set1/it/challenge_07/) | [EN](/set1/en/challenge_07/) |
-| 8 | Rileva AES in modalità ECB | Identifica blocchi duplicati nel ciphertext | [IT](/set1/it/challenge_08/) | [EN](/set1/en/challenge_08/) |
+| 1 | Converti hex in base64 | Conversione tra formati di codifica binaria | [IT](it/challenge_01/) | [EN](en/challenge_01/) |
+| 2 | XOR fisso | XOR bit-a-bit tra due sequenze di byte | [IT](it/challenge_02/) | [EN](en/challenge_02/) |
+| 3 | Cifrario XOR a carattere singolo | Decifra XOR con un singolo byte di chiave | [IT](it/challenge_03/) | [EN](en/challenge_03/) |
+| 4 | Rileva XOR a carattere singolo | Trova la riga cifrata in un file | [IT](it/challenge_04/) | [EN](en/challenge_04/) |
+| 5 | Implementa XOR a chiave ripetuta | Cifrario Vigenère su byte | [IT](it/challenge_05/) | [EN](en/challenge_05/) |
+| 6 | Rompi XOR a chiave ripetuta | Attacco statistico con distanza di Hamming | [IT](it/challenge_06/) | [EN](en/challenge_06/) |
+| 7 | Decifra AES in modalità ECB | Primo contatto con AES-ECB | [IT](it/challenge_07/) | [EN](en/challenge_07/) |
+| 8 | Rileva AES in modalità ECB | Identifica blocchi duplicati nel ciphertext | [IT](it/challenge_08/) | [EN](en/challenge_08/) |
