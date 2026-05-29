@@ -12,7 +12,10 @@ The output must be a fully working Jekyll site under `docs/`. GitHub Pages will 
 ```yaml
 title: Rust Cryptopals
 description: Soluzioni alle Cryptopals Crypto Challenges in Rust — documentazione bilingue IT/EN
-theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs@v0.10.0
+
+plugins:
+  - jekyll-remote-theme
 url: ""
 baseurl: ""
 lang: it
