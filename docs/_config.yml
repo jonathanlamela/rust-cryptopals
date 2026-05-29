@@ -1,0 +1,18 @@
+title: Rust Cryptopals
+description: Soluzioni alle Cryptopals Crypto Challenges in Rust — documentazione bilingue IT/EN
+theme: just-the-docs
+url: ""
+baseurl: ""
+lang: it
+
+# Just the Docs settings
+search_enabled: true
+heading_anchors: true
+color_scheme: light
+nav_sort: case_sensitive
+
+aux_links:
+  "GitHub":
+    - "//github.com/yourusername/rust-cryptopals"
+
+footer_content: "Rust Cryptopals Docs · Just the Docs theme"

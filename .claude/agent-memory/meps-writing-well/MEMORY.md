@@ -1,0 +1,2 @@
+- [User Role](user_role.md) — user writes Italian technical docs for Rust Cryptopals project; audience is developers learning applied crypto
+- [Italian Doc Conventions](feedback_italian_doc_conventions.md) — "asserisce" for assert macros; titles must match indexes; identifiers stay in English; acronym glosses use lowercase
