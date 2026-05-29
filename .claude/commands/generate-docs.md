@@ -16,8 +16,8 @@ remote_theme: just-the-docs/just-the-docs@v0.10.0
 
 plugins:
   - jekyll-remote-theme
-url: ""
-baseurl: ""
+url: "https://jonathanlamela.github.io"
+baseurl: "/rust-cryptopals"
 lang: it
 
 # Just the Docs settings
@@ -36,7 +36,7 @@ footer_content: "Rust Cryptopals Docs · Just the Docs theme"
 **`docs/index.md`** — home page (Italian), frontmatter:
 ```yaml
 ---
-layout: home
+layout: default
 title: Home
 nav_order: 1
 ---
@@ -45,7 +45,7 @@ nav_order: 1
 **`docs/index_en.md`** — home page (English), frontmatter:
 ```yaml
 ---
-layout: home
+layout: default
 title: Home (EN)
 nav_order: 2
 ---

@@ -1,5 +1,5 @@
 ---
-layout: home
+layout: default
 title: Home (EN)
 nav_order: 2
 ---
