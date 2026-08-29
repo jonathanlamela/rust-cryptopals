@@ -4,11 +4,14 @@ mod tests {
 
     use crate::crypters::CustomCrypter17;
     use crate::cryptovec::CryptoVec;
+    use crate::mt19937::{clone_mt19937, untemper, MT19937};
     use crate::usizecrypt::USizeCrypt;
 
+    use rand::Rng;
     use std::fs::File;
     use std::io::prelude::*;
     use std::io::BufReader;
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     #[test]
     pub fn challenge_17() {
@@ -224,5 +227,202 @@ mod tests {
 
         // Verify that the decrypted string contains the desired substring
         assert!(res_plain.contains("I'm rated"));
+    }
+
+    // Test the MT19937 Mersenne Twister RNG implementation (challenge 21).
+    #[test]
+    pub fn challenge_21() {
+        // Verify that MT19937 with known seed 5489 produces the reference outputs
+        let mut mt = MT19937::new(5489);
+        let expected = [3499211612u32, 581869302, 3890346734, 3586334585, 545404204];
+        for &exp in &expected {
+            let val = mt.extract_number();
+            assert_eq!(val, exp);
+        }
+
+        // Verify that two instances with the same seed produce identical sequences
+        let mut mt1 = MT19937::new(0);
+        let mut mt2 = MT19937::new(0);
+        for _ in 0..100 {
+            assert_eq!(mt1.extract_number(), mt2.extract_number());
+        }
+
+        // Verify that different seeds produce different sequences
+        let mut mt_a = MT19937::new(42);
+        let mut mt_b = MT19937::new(43);
+        let out_a = mt_a.extract_number();
+        let out_b = mt_b.extract_number();
+        assert_ne!(out_a, out_b);
+
+        // Verify untemper correctly inverts temper for random values
+        let mut mt_check = MT19937::new(12345);
+        for _ in 0..10 {
+            let tempered = mt_check.extract_number();
+            // untemper should recover the internal state value before tempering
+            let recovered = untemper(tempered);
+            // Re-temper recovered value should give the same output
+            let mut y = recovered;
+            y ^= (y >> 11) & 0xFFFFFFFF;
+            y ^= (y << 7) & 0x9D2C5680;
+            y ^= (y << 15) & 0xEFC60000;
+            y ^= y >> 18;
+            assert_eq!(y, tempered);
+        }
+    }
+
+    // Test cracking an MT19937 seed from timestamp (challenge 22).
+    #[test]
+    pub fn challenge_22() {
+        let mut rng = rand::thread_rng();
+
+        // Simulate: seed with current unix time after a random wait (40..1000 sec)
+        // Without actually sleeping, we pick a seed in the recent past
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as u32;
+
+        let wait1: u32 = rng.gen_range(40..1000);
+        let seed = now - wait1;
+
+        // Create MT19937 with the seed and get first output
+        let mut mt = MT19937::new(seed);
+        let first_output = mt.extract_number();
+
+        // Attacker knows the output and that seed was generated within last 2000 seconds
+        let mut cracked_seed: Option<u32> = None;
+        for i in 0..2000 {
+            let candidate = now - i;
+            let mut test_mt = MT19937::new(candidate);
+            if test_mt.extract_number() == first_output {
+                cracked_seed = Some(candidate);
+                break;
+            }
+        }
+
+        // Verify that the cracked seed matches the original
+        assert!(cracked_seed.is_some());
+        assert_eq!(cracked_seed.unwrap(), seed);
+
+        // Additional check: simulate second wait and ensure brute force still works with random seed
+        let random_seed: u32 = rng.gen_range(0..10000);
+        let mut mt2 = MT19937::new(random_seed);
+        let out2 = mt2.extract_number();
+        let mut found = None;
+        for candidate in 0..20000u32 {
+            let mut test = MT19937::new(candidate);
+            if test.extract_number() == out2 {
+                found = Some(candidate);
+                break;
+            }
+        }
+        assert_eq!(found.unwrap(), random_seed);
+    }
+
+    // Test cloning an MT19937 from its output (challenge 23).
+    #[test]
+    pub fn challenge_23() {
+        // Create a random MT19937 with unknown seed
+        let mut rng = rand::thread_rng();
+        let seed: u32 = rng.gen();
+        let mut original = MT19937::new(seed);
+
+        // Collect 624 consecutive outputs (full state)
+        let mut outputs: Vec<u32> = Vec::new();
+        for _ in 0..624 {
+            outputs.push(original.extract_number());
+        }
+
+        // Clone the RNG from the outputs
+        let mut cloned = clone_mt19937(&outputs);
+
+        // Verify that the cloned RNG predicts the next outputs correctly
+        for _ in 0..100 {
+            let expected = original.extract_number();
+            let predicted = cloned.extract_number();
+            assert_eq!(predicted, expected);
+        }
+
+        // Also test with known seed 0 to ensure deterministic cloning
+        let mut mt_known = MT19937::new(0);
+        let mut known_outputs = Vec::new();
+        for _ in 0..624 {
+            known_outputs.push(mt_known.extract_number());
+        }
+        let mut cloned_known = clone_mt19937(&known_outputs);
+        for _ in 0..10 {
+            assert_eq!(mt_known.extract_number(), cloned_known.extract_number());
+        }
+    }
+
+    // Test MT19937 stream cipher and its break (challenge 24).
+    #[test]
+    pub fn challenge_24() {
+        let mut rng = rand::thread_rng();
+
+        // Known plaintext suffix (attacker knows this part)
+        let known_plaintext = b"AAAAAAAAAAAAAA"; // 14 x 'A' as per challenge description
+
+        // Generate a random 16-bit seed (key) and random prefix length
+        let seed: u16 = rng.gen();
+        let prefix_len: usize = rng.gen_range(5..20);
+        let prefix: Vec<u8> = prefix_len.random_block();
+
+        // Build the plaintext: random prefix + known plaintext
+        let mut plaintext = Vec::new();
+        plaintext.extend_from_slice(&prefix);
+        plaintext.extend_from_slice(known_plaintext);
+
+        // Encrypt with MT19937 stream cipher
+        let mut mt_enc = MT19937::new(seed as u32);
+        let ciphertext = mt_enc.encrypt(&plaintext);
+
+        // Attacker: brute force all 2^16 seeds, check for known plaintext at the end
+        let mut cracked_seed: Option<u16> = None;
+        let mut cracked_plaintext: Option<Vec<u8>> = None;
+        for candidate in 0u16..=u16::MAX {
+            let mut mt_candidate = MT19937::new(candidate as u32);
+            let candidate_plaintext = mt_candidate.encrypt(&ciphertext);
+            if candidate_plaintext.ends_with(known_plaintext) {
+                cracked_seed = Some(candidate);
+                cracked_plaintext = Some(candidate_plaintext);
+                break;
+            }
+        }
+
+        // Verify that the seed was recovered and plaintext matches
+        assert!(cracked_seed.is_some());
+        assert_eq!(cracked_seed.unwrap(), seed);
+        assert_eq!(cracked_plaintext.unwrap(), plaintext);
+
+        // Additional test: encrypt arbitrary data and verify decrypt round-trip
+        let seed2: u16 = rng.gen();
+        let data = b"Test message for MT19937 stream cipher round-trip";
+        let mut enc = MT19937::new(seed2 as u32);
+        let ct = enc.encrypt(data);
+        let mut dec = MT19937::new(seed2 as u32);
+        let pt = dec.encrypt(&ct);
+        assert_eq!(pt, data);
+
+        // Test with token reset attack (password reset token seeded with timestamp)
+        let now = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as u32;
+        let token_seed = now - rng.gen_range(0..100);
+        let mut token_mt = MT19937::new(token_seed);
+        let token = token_mt.extract_number();
+
+        // Attacker brute forces last 200 seconds to find token seed
+        let mut token_found = None;
+        for i in 0..200 {
+            let candidate = now - i;
+            let mut test_mt = MT19937::new(candidate);
+            if test_mt.extract_number() == token {
+                token_found = Some(candidate);
+                break;
+            }
+        }
+        assert_eq!(token_found.unwrap(), token_seed);
     }
 }

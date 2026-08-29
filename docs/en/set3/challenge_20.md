@@ -10,7 +10,7 @@ lang: en
 
 # Challenge 20 — Break fixed-nonce CTR statistically
 
-[← Previous](../challenge_19/) · [🇮🇹 Italiano](../../../it/set3/challenge_20/) · [Set 3](../) · [Home](../../)
+[← Previous](../challenge_19/) · [Next →](../challenge_21/) · [🇮🇹 Italiano](../../../it/set3/challenge_20/) · [Set 3](../) · [Home](../../)
 
 ---
 

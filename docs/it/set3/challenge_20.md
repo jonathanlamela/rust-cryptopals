@@ -10,7 +10,7 @@ lang: it
 
 # Sfida 20 — Rompi CTR a nonce fisso (statisticamente)
 
-[← Sfida precedente](../challenge_19/) · [🇬🇧 English](../../../en/set3/challenge_20/) · [Set 3](../) · [Home](../../)
+[← Sfida precedente](../challenge_19/) · [Sfida successiva →](../challenge_21/) · [🇬🇧 English](../../../en/set3/challenge_20/) · [Set 3](../) · [Home](../../)
 
 ---
 

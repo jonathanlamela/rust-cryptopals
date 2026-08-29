@@ -3,6 +3,7 @@ pub mod crypters;
 pub mod cryptovec;
 pub mod errors;
 pub mod hex;
+pub mod mt19937;
 pub mod oracle;
 pub mod usizecrypt;
 
